@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Constellation Map</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Monda:wght@400;700&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #00000a;
+      overflow: hidden;
+      font-family: 'Monda', 'Georgia', sans-serif;
+    }
+
+    #canvas-container { width: 100vw; height: 100vh; }
+
+    /* Radial vignette darkening edges */
+    #vignette {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse at center,
+        transparent 55%,
+        rgba(0,0,8,0.55) 80%,
+        rgba(0,0,12,0.92) 100%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    #grain {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0.08;
+      background-image:
+        repeating-radial-gradient(circle at 20% 30%, rgba(255,255,255,0.14) 0 0.6px, transparent 0.6px 2.6px),
+        repeating-radial-gradient(circle at 70% 65%, rgba(255,255,255,0.12) 0 0.5px, transparent 0.5px 2.3px);
+      mix-blend-mode: screen;
+      animation: drift 14s linear infinite;
+    }
+
+    @keyframes drift {
+      from { transform: translate3d(0, 0, 0); }
+      to { transform: translate3d(-2%, 2%, 0); }
+    }
+
+    #title {
+      position: fixed;
+      top: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: rgba(190, 215, 255, 0.80);
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.45em;
+      text-transform: uppercase;
+      pointer-events: none;
+      user-select: none;
+      z-index: 2;
+      text-shadow: 0 0 18px rgba(120,160,255,0.6);
+    }
+
+    #info {
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: rgba(160, 185, 230, 0.45);
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-align: center;
+      pointer-events: none;
+      user-select: none;
+      z-index: 2;
+    }
+
+    #constellation-info {
+      position: fixed;
+      bottom: 68px;
+      left: 50%;
+      transform: translateX(-50%);
+      text-align: center;
+      pointer-events: none;
+      user-select: none;
+      z-index: 2;
+      opacity: 0;
+      transition: opacity 1.4s ease;
+      max-width: 520px;
+      width: 90vw;
+    }
+
+    #constellation-info .con-name {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.85);
+      margin-bottom: 3px;
+    }
+
+    #constellation-info .con-translation {
+      font-size: 11px;
+      font-weight: 400;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(190, 210, 255, 0.38);
+      margin-bottom: 8px;
+    }
+
+    #constellation-info .con-desc {
+      font-size: 12px;
+      font-weight: 400;
+      letter-spacing: 0.06em;
+      line-height: 1.6;
+      color: rgba(190, 210, 255, 0.6);
+    }
+
+    #fps {
+      position: fixed;
+      top: 28px;
+      right: 28px;
+      color: rgba(160, 185, 230, 0.55);
+      font-family: 'Monda', monospace;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      pointer-events: none;
+      user-select: none;
+      z-index: 2;
+    }
+
+    #demo-badge {
+      display: none;
+      position: fixed;
+      top: 48px;
+      right: 28px;
+      color: rgba(180, 220, 255, 0.85);
+      font-family: 'Monda', monospace;
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      pointer-events: none;
+      user-select: none;
+      z-index: 2;
+      text-shadow: 0 0 10px rgba(120, 180, 255, 0.6);
+    }
+  </style>
+</head>
+<body>
+  <div id="canvas-container"></div>
+  <div id="vignette"></div>
+  <div id="grain"></div>
+  <div id="title">Night Sky</div>
+  <div id="constellation-info">
+    <div class="con-name" id="con-name"></div>
+    <div class="con-translation" id="con-translation"></div>
+    <div class="con-desc" id="con-desc"></div>
+  </div>
+  <div id="info">Drag to rotate &nbsp;&middot;&nbsp; Scroll to zoom &nbsp;&middot;&nbsp; D &mdash; demo mode</div>
+  <div id="fps">-- FPS</div>
+  <div id="demo-badge">Demo</div>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.163.0/examples/jsm/"
+      }
+    }
+  </script>
+  <script type="module" src="main.js"></script>
+</body>
+</html>
