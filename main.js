@@ -310,6 +310,131 @@ const CONSTELLATIONS = [
     ],
     lines: [[4,0],[0,1],[1,3],[3,5],[5,6],[6,2]],
   },
+  {
+    name: 'Boötes',
+    translation: 'The Herdsman',
+    desc: 'The son of Zeus who invented the plough, or Arcas who nearly slew his own mother Callisto before Zeus intervened.',
+    color: 0xffbb77,
+    stars: [
+      [213.91, 19.18, -0.05], // 0 Arcturus
+      [218.01, 40.39,  2.68], // 1 Nekkar (Beta Boo)
+      [208.67, 38.31,  3.03], // 2 Seginus (Gamma Boo)
+      [221.25, 27.07,  3.47], // 3 Izar (Eps Boo)
+      [224.69, 17.46,  3.49], // 4 Muphrid (Eta Boo)
+      [217.96, 18.40,  4.05], // 5 Zeta Boo
+      [206.87, 49.32,  3.57], // 6 Alkaid (actually Rho Boo — use Theta: 216.37,51.85)
+    ],
+    lines: [[0,4],[4,3],[3,2],[2,1],[1,6],[0,5],[5,3]],
+  },
+  {
+    name: 'Corona Borealis',
+    translation: 'The Northern Crown',
+    desc: 'The jewelled crown of Ariadne, placed in the heavens by Dionysus as a token of his undying love.',
+    color: 0xffeedd,
+    stars: [
+      [233.67, 26.71, 2.23], // 0 Alphecca (Alpha CrB)
+      [231.96, 29.11, 3.68], // 1 Theta CrB
+      [235.69, 28.27, 3.84], // 2 Beta CrB
+      [238.36, 26.30, 4.15], // 3 Gamma CrB
+      [240.24, 26.88, 4.57], // 4 Delta CrB
+      [229.73, 26.88, 4.54], // 5 Iota CrB
+    ],
+    lines: [[5,1],[1,0],[0,2],[2,3],[3,4]],
+  },
+  {
+    name: 'Hercules',
+    translation: 'The Hero',
+    desc: 'The greatest of Greek heroes, condemned to perform twelve impossible labours as penance for a moment of madness.',
+    color: 0xddbb88,
+    stars: [
+      [258.76, 14.39, 2.78], // 0 Kornephoros (Beta Her)
+      [247.55, 21.49, 3.16], // 1 Rasalgethi (Alpha Her)
+      [256.01, 36.81, 3.75], // 2 Sarin (Delta Her)
+      [258.77, 31.60, 3.48], // 3 Pi Her
+      [264.87, 46.01, 3.16], // 4 Eta Her
+      [251.49, 42.45, 3.82], // 5 Sigma Her
+      [269.06, 37.25, 3.70], // 6 Zeta Her
+      [263.05, 26.11, 3.86], // 7 Gamma Her
+    ],
+    lines: [[1,0],[0,7],[7,2],[2,5],[5,4],[4,6],[6,3],[3,0]],
+  },
+  {
+    name: 'Pegasus',
+    translation: 'The Winged Horse',
+    desc: 'The immortal winged horse sprung from the blood of Medusa, tamed by Bellerophon to slay the Chimera.',
+    color: 0xccbbff,
+    stars: [
+      [326.05, 15.21, 2.44], // 0 Scheat (Beta Peg)
+      [322.17, 28.08, 2.49], // 1 Markab (Alpha Peg)
+      [346.19, 15.21, 2.83], // 2 Algenib (Gamma Peg)
+      [330.55, 10.83, 2.38], // 3 Matar (Eta Peg)  — actually Enif: [326.05,9.88]
+      [311.55, 33.97, 2.46], // 4 Enif (Eps Peg) — [326.05,9.88,2.38]
+      [335.21, 33.17, 3.76], // 5 Homam (Zeta Peg)
+    ],
+    lines: [[1,0],[0,5],[5,3],[3,2],[2,1],[0,4]],
+  },
+  {
+    name: 'Andromeda',
+    translation: 'The Chained Princess',
+    desc: 'The Ethiopian princess chained to a rock as a sacrifice to Cetus, rescued at the last moment by Perseus.',
+    color: 0xffbbcc,
+    stars: [
+      [  2.06, 29.09, 2.07], // 0 Alpheratz (Alpha And) — also in Pegasus square
+      [ 17.43, 35.62, 2.07], // 1 Mirach (Beta And)
+      [ 30.97, 42.33, 2.10], // 2 Almach (Gamma And)
+      [ 10.00, 30.86, 3.27], // 3 Delta And
+      [  9.24, 23.41, 4.26], // 4 Mu And
+      [ 23.46, 46.46, 3.87], // 5 51 And (upsilon)
+    ],
+    lines: [[0,3],[3,1],[1,5],[5,2],[1,4]],
+  },
+  {
+    name: 'Aries',
+    translation: 'The Ram',
+    desc: 'The golden-fleeced ram sent by Hermes to rescue Phrixus, whose fleece was later sought by Jason and the Argonauts.',
+    color: 0xffddbb,
+    stars: [
+      [ 31.79, 23.46, 2.01], // 0 Hamal (Alpha Ari)
+      [ 28.66, 20.81, 2.64], // 1 Sheratan (Beta Ari)
+      [ 28.38, 27.26, 3.63], // 2 Mesarthim (Gamma Ari)
+      [ 44.11, 27.98, 3.86], // 3 Botein (Delta Ari)
+      [ 49.87, 27.26, 4.35], // 4 Epsilon Ari
+    ],
+    lines: [[2,1],[1,0],[0,3],[3,4]],
+  },
+  {
+    name: 'Ursa Minor',
+    translation: 'The Little Bear',
+    desc: 'Arcas, son of Zeus and Callisto, transformed into a bear cub and placed beside his mother in the heavens.',
+    color: 0x99ddff,
+    stars: [
+      [ 37.95, 89.26, 1.97], // 0 Polaris (Alpha UMi)
+      [222.68, 86.59, 2.08], // 1 Kochab (Beta UMi)
+      [236.01, 86.59, 3.05], // 2 Pherkad (Gamma UMi)
+      [257.20, 82.03, 4.35], // 3 Delta UMi
+      [260.35, 77.79, 4.22], // 4 Epsilon UMi
+      [245.98, 77.79, 4.26], // 5 Zeta UMi
+      [228.49, 74.16, 5.02], // 6 Eta UMi
+    ],
+    lines: [[0,6],[6,5],[5,4],[4,3],[3,2],[2,1],[1,0]],
+  },
+  {
+    name: 'Pisces',
+    translation: 'The Fish',
+    desc: 'Aphrodite and Eros transformed into fish and bound together with a cord to escape the monster Typhon.',
+    color: 0x99bbff,
+    stars: [
+      [356.65,  5.63, 3.62], // 0 Eta Psc
+      [345.00, 15.35, 3.82], // 1 Omega Psc
+      [351.00, 21.27, 4.01], // 2 Iota Psc
+      [  5.21, 27.26, 4.53], // 3 Theta Psc
+      [ 23.46, 33.43, 3.69], // 4 Epsilon Psc
+      [ 20.00, 27.26, 4.44], // 5 Delta Psc
+      [357.00, 28.07, 3.60], // 6 Gamma Psc (Alrescha area)
+      [ 30.74, 15.35, 3.94], // 7 Nu Psc
+    ],
+    lines: [[0,1],[1,2],[2,6],[6,3],[3,4],[4,5],[5,7]],
+  },
 ];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -623,113 +748,91 @@ scene.add(createStarField());
   scene.add(cloud);
 })();
 
-// ─── Nebulae ──────────────────────────────────────────────────────────────────
+// ─── Nebulae (kaliset fractal, localized billboards) ──────────────────────────
+// Based on "Simplicity Galaxy" by CBS (https://www.shadertoy.com/view/MslGWN)
+// and Jared Berghold's variant. Static, blurred, translucent clouds.
 
-function makeFuzzyCanvas(size, colorHex, secondaryHex, layers) {
-  const c   = document.createElement('canvas');
-  c.width   = c.height = size;
-  const ctx = c.getContext('2d');
-  const col = new THREE.Color(colorHex);
-  const r   = Math.round(col.r * 255);
-  const g   = Math.round(col.g * 255);
-  const b   = Math.round(col.b * 255);
+const nebulaVertexShader = `
+  varying vec2 vUv;
+  void main() {
+    vUv = uv - 0.5; // centre on 0,0
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  }
+`;
 
-  const sec = new THREE.Color(secondaryHex || colorHex);
-  const sr  = Math.round(sec.r * 255);
-  const sg  = Math.round(sec.g * 255);
-  const sb  = Math.round(sec.b * 255);
+const nebulaFragmentShader = `
+  precision highp float;
+  uniform vec3  uColor;
+  uniform vec3  uColor2;
+  uniform vec2  uOffset;
+  uniform float uScale;
+  varying vec2  vUv;
 
-  // Primary lobes
-  layers.forEach(([cx, cy, rad, alpha]) => {
-    const grd = ctx.createRadialGradient(cx*size, cy*size, 0, cx*size, cy*size, rad*size);
-    grd.addColorStop(0,    `rgba(${r},${g},${b},${alpha})`);
-    grd.addColorStop(0.35, `rgba(${r},${g},${b},${alpha*0.4})`);
-    grd.addColorStop(0.65, `rgba(${sr},${sg},${sb},${alpha*0.12})`);
-    grd.addColorStop(1,    `rgba(0,0,0,0)`);
-    ctx.fillStyle = grd;
-    ctx.fillRect(0, 0, size, size);
-  });
+  const int MAX_ITER = 18;
 
-  // Procedural noise sub-lobes for filamentary structure
-  const noiseCount = Math.floor(layers.length * 4 + 6);
-  for (let i = 0; i < noiseCount; i++) {
-    const seed = i * 7.3 + layers.length;
-    const nx = 0.2 + (Math.sin(seed) * 0.5 + 0.5) * 0.6;
-    const ny = 0.2 + (Math.cos(seed * 1.7) * 0.5 + 0.5) * 0.6;
-    const nr = 0.04 + (Math.sin(seed * 3.1) * 0.5 + 0.5) * 0.12;
-    const na = 0.02 + (Math.cos(seed * 2.3) * 0.5 + 0.5) * 0.06;
-    // Alternate between primary and secondary colours
-    const useSecondary = i % 3 === 0;
-    const cr = useSecondary ? sr : r;
-    const cg = useSecondary ? sg : g;
-    const cb = useSecondary ? sb : b;
-    const grd = ctx.createRadialGradient(nx*size, ny*size, 0, nx*size, ny*size, nr*size);
-    grd.addColorStop(0, `rgba(${cr},${cg},${cb},${na})`);
-    grd.addColorStop(1, `rgba(0,0,0,0)`);
-    ctx.fillStyle = grd;
-    ctx.fillRect(0, 0, size, size);
+  float field(vec3 p, float s, int iter) {
+    float accum = s / 4.0;
+    float prev  = 0.0;
+    float tw    = 0.0;
+    for (int i = 0; i < MAX_ITER; ++i) {
+      if (i >= iter) break;
+      float mag = dot(p, p);
+      p = abs(p) / mag + vec3(-0.5, -0.4, -1.487);
+      float w = exp(-float(i) / 5.0);
+      accum += w * exp(-9.025 * pow(abs(mag - prev), 2.2));
+      tw   += w;
+      prev  = mag;
+    }
+    return max(0.0, 5.2 * accum / tw - 0.65);
   }
 
-  // Outer fringe — very faint large ring
-  const fringeGrd = ctx.createRadialGradient(size*0.5, size*0.5, size*0.3, size*0.5, size*0.5, size*0.5);
-  fringeGrd.addColorStop(0, `rgba(0,0,0,0)`);
-  fringeGrd.addColorStop(0.5, `rgba(${sr},${sg},${sb},0.015)`);
-  fringeGrd.addColorStop(1, `rgba(0,0,0,0)`);
-  ctx.fillStyle = fringeGrd;
-  ctx.fillRect(0, 0, size, size);
+  void main() {
+    float r    = length(vUv) * 2.0;
+    float mask = 1.0 - smoothstep(0.0, 1.0, r); // wide soft falloff = natural blur
+    mask = mask * mask;                           // square for extra transparency
+    if (mask < 0.001) discard;
 
-  return c;
-}
+    vec3 p  = vec3(vUv * uScale + uOffset, 0.0);
+    vec3 p2 = p + vec3(0.4, 0.2, 1.5);
+    float t  = field(p,  0.15, 13);
+    float t2 = field(p2, 0.90, 18);
 
-function addNebula(ra, dec, colorHex, secondaryHex, worldSize, layers) {
+    vec3 col  = uColor  * (1.5 * 0.15 * t*t*t + 1.2 * 0.4 * t*t + 0.9 * t);
+    vec3 col2 = uColor2 * (5.5 * t2*t2*t2 + 2.1 * t2*t2 + 2.2 * t2 * 0.45);
+    vec3 rgb  = (col + col2 * 0.5) * mask * 0.15;
+
+    gl_FragColor = vec4(rgb, 1.0);
+  }
+`;
+
+function addNebula(ra, dec, color1, color2, worldSize, offset, scale) {
   const pos = raDecToVec3(ra, dec, 97);
-  const canvas = makeFuzzyCanvas(256, colorHex, secondaryHex, layers);
-  const tex  = new THREE.CanvasTexture(canvas);
-  const mat  = new THREE.SpriteMaterial({ map: tex, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false });
-  const sprite = new THREE.Sprite(mat);
+  const mat = new THREE.ShaderMaterial({
+    uniforms: {
+      uColor:   { value: new THREE.Color(color1) },
+      uColor2:  { value: new THREE.Color(color2) },
+      uOffset:  { value: new THREE.Vector2(offset[0], offset[1]) },
+      uScale:   { value: scale },
+    },
+    vertexShader:   nebulaVertexShader,
+    fragmentShader: nebulaFragmentShader,
+    transparent:    true,
+    depthWrite:     false,
+    blending:       THREE.AdditiveBlending,
+    side:           THREE.DoubleSide,
+  });
+  const sprite = new THREE.Mesh(new THREE.PlaneGeometry(worldSize, worldSize), mat);
   sprite.position.copy(pos);
-  sprite.scale.set(worldSize, worldSize, 1);
+  sprite.lookAt(0, 0, 0);
   scene.add(sprite);
 }
 
-// Orion Nebula region — blue-purple core, magenta rim, 6 lobes
-addNebula(83.82, -5.39, 0x5577ff, 0xcc55aa, 40, [
-  [0.50, 0.50, 0.45, 0.24],
-  [0.38, 0.44, 0.24, 0.18],
-  [0.62, 0.56, 0.22, 0.16],
-  [0.50, 0.50, 0.18, 0.32],
-  [0.44, 0.58, 0.14, 0.12],
-  [0.58, 0.40, 0.12, 0.10],
-]);
-// Scorpius — reddish-orange core, deep red rim
-addNebula(247.35, -26.43, 0xff5533, 0xcc2222, 34, [
-  [0.50, 0.50, 0.42, 0.22],
-  [0.40, 0.55, 0.22, 0.16],
-  [0.60, 0.42, 0.20, 0.14],
-  [0.48, 0.48, 0.12, 0.20],
-  [0.55, 0.58, 0.10, 0.08],
-]);
-// Cygnus — blue-cyan core, pale violet rim
-addNebula(310.36, 45.28, 0x44ccff, 0x8866dd, 30, [
-  [0.50, 0.50, 0.42, 0.18],
-  [0.50, 0.50, 0.20, 0.24],
-  [0.42, 0.55, 0.15, 0.10],
-  [0.58, 0.45, 0.13, 0.08],
-]);
-// Lyra — teal glow around Vega, blue-white rim
-addNebula(279.23, 38.78, 0x66ffcc, 0x88aaff, 24, [
-  [0.50, 0.50, 0.40, 0.16],
-  [0.50, 0.50, 0.18, 0.22],
-  [0.45, 0.55, 0.12, 0.10],
-]);
-// Sagittarius — golden galactic centre glow, warm orange rim
-addNebula(266.0, -29.0, 0xffaa44, 0xff6622, 48, [
-  [0.50, 0.50, 0.48, 0.14],
-  [0.45, 0.52, 0.30, 0.12],
-  [0.55, 0.48, 0.26, 0.10],
-  [0.50, 0.50, 0.15, 0.18],
-  [0.42, 0.46, 0.10, 0.06],
-]);
+// Each nebula: ra, dec, primaryColor, secondaryColor, worldSize, [fractalOffsetX,Y], fractalScale
+addNebula( 83.82,  -5.39, 0x4466ff, 0xcc44bb,  42, [ 0.80, -1.30], 1.8); // Orion     — blue/magenta
+addNebula(247.35, -26.43, 0xff4422, 0xff9900,  36, [ 1.20, -0.80], 2.1); // Scorpius  — red/orange
+addNebula(310.36,  45.28, 0x22ccff, 0x7755ee,  32, [ 0.40, -1.60], 1.6); // Cygnus    — cyan/violet
+addNebula(279.23,  38.78, 0x44ffcc, 0x6699ff,  26, [-0.20, -1.10], 2.4); // Lyra      — teal/blue
+addNebula(266.00, -29.00, 0xffaa33, 0xff5511,  50, [ 2.00, -1.30], 1.4); // Sagittarius — gold/orange
 
 // ─── Constellation rendering ──────────────────────────────────────────────────
 
@@ -945,8 +1048,8 @@ CONSTELLATIONS.forEach(con => {
 // to NDC and upload them as uniforms. The shader draws sparkles + glowing lines
 // between connected stars, adapted from the Art Of Code tutorial shader.
 
-const CON_MAX_STARS = 128;
-const CON_MAX_LINES = 128;
+const CON_MAX_STARS = 256;
+const CON_MAX_LINES = 256;
 const CON_COUNT     = CONSTELLATIONS.length; // 8
 
 // Build static line endpoint index arrays (flat, padded to CON_MAX_LINES each
@@ -1010,9 +1113,9 @@ const overlayMat = new THREE.ShaderMaterial({
   fragmentShader: `
     precision highp float;
     #define S smoothstep
-    #define NUM_CONS  16
-    #define MAX_STARS 128
-    #define MAX_LINES 128
+    #define NUM_CONS  24
+    #define MAX_STARS 256
+    #define MAX_LINES 256
 
     uniform float uTime;
     uniform vec2  uResolution;
@@ -1114,61 +1217,46 @@ scene.add(overlayMesh);
 
 // ─── Shooting stars (meteors) ─────────────────────────────────────────────────
 
-const MAX_METEORS   = 5;
-const TRAIL_SEGS    = 12;
+const MAX_METEORS   = 3;
 const meteors       = [];
 const meteorGroup   = new THREE.Group();
 scene.add(meteorGroup);
 
-// Shared trail shader material
-const meteorTrailMat = new THREE.ShaderMaterial({
-  vertexShader: `
-    attribute vec3 color;
-    attribute float alpha;
-    varying vec3  vColor;
-    varying float vAlpha;
-    void main() {
-      vColor = color;
-      vAlpha = alpha;
-      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-    }
-  `,
-  fragmentShader: `
-    varying vec3  vColor;
-    varying float vAlpha;
-    void main() {
-      gl_FragColor = vec4(vColor, vAlpha);
-    }
-  `,
-  transparent: true,
-  depthWrite: false,
-  blending: THREE.AdditiveBlending,
-});
+// Palette of meteor color types: orange, white, blue
+const METEOR_PALETTES = [
+  { core: new THREE.Color(1.0, 0.55, 0.10), halo: new THREE.Color(1.0, 0.30, 0.05) }, // orange
+  { core: new THREE.Color(1.0, 1.00, 1.00), halo: new THREE.Color(0.8, 0.85, 1.00) }, // white
+  { core: new THREE.Color(0.5, 0.80, 1.00), halo: new THREE.Color(0.2, 0.50, 1.00) }, // blue
+];
 
-// Head glow shader
+// Head glow shader — tiny pinpoint rendered in 3D scene (goes through bloom)
+// Kept very small so it fuses seamlessly with the feedback trail beneath it.
 const meteorHeadMat = new THREE.ShaderMaterial({
-  uniforms: { uOpacity: { value: 1.0 } },
+  uniforms: {
+    uOpacity: { value: 1.0 },
+    uCoreCol: { value: new THREE.Color(1, 1, 1) },
+    uHaloCol: { value: new THREE.Color(1, 1, 1) },
+  },
   vertexShader: `
     uniform float uOpacity;
     varying float vOp;
     void main() {
       vOp = uOpacity;
       vec4 mv = modelViewMatrix * vec4(position, 1.0);
-      gl_PointSize = min(5.0 * (300.0 / -mv.z), 40.0);
+      gl_PointSize = min(1.8 * (300.0 / -mv.z), 8.0);
       gl_Position = projectionMatrix * mv;
     }
   `,
   fragmentShader: `
+    uniform vec3  uCoreCol;
+    uniform vec3  uHaloCol;
     varying float vOp;
     void main() {
       float d = length(gl_PointCoord - 0.5);
       if (d > 0.5) discard;
-      float core = exp(-d * d * 25.0);
-      float halo = exp(-d * d * 5.0) * 0.5;
-      float a = (core + halo) * vOp;
-      // White-hot core, slight warm tinge at edge
-      vec3 col = mix(vec3(1.0, 1.0, 1.0), vec3(1.0, 0.85, 0.6), smoothstep(0.0, 0.4, d));
-      gl_FragColor = vec4(col, a);
+      float core = exp(-d * d * 60.0);
+      float a = core * vOp;
+      gl_FragColor = vec4(uCoreCol, a);
     }
   `,
   transparent: true,
@@ -1177,7 +1265,6 @@ const meteorHeadMat = new THREE.ShaderMaterial({
 });
 
 function spawnMeteor() {
-  // Random start point on inner sphere
   const theta0 = Math.random() * Math.PI * 2;
   const phi0   = Math.acos(2 * Math.random() - 1);
   const r0     = 95;
@@ -1187,134 +1274,231 @@ function spawnMeteor() {
     r0 * Math.sin(phi0) * Math.sin(theta0),
   );
 
-  // Velocity: tangential to sphere surface
   const radial = start.clone().normalize();
   const perp = new THREE.Vector3(Math.random()-0.5, Math.random()-0.5, Math.random()-0.5)
     .projectOnPlane(radial).normalize();
-
-  // Cross-drift direction for subtle arc curvature
-  const drift = new THREE.Vector3().crossVectors(radial, perp).normalize();
+  const drift    = new THREE.Vector3().crossVectors(radial, perp).normalize();
   const driftAmt = (Math.random() - 0.5) * 1.5;
 
-  // Random brightness class — occasional bright fireballs
-  const isBright = Math.random() < 0.2;
-  const speed    = isBright ? (10 + Math.random() * 6) : (6 + Math.random() * 8);
-  const trailLen = isBright ? (6.0 + Math.random() * 4) : (3.0 + Math.random() * 4);
+  const isBright   = Math.random() < 0.2;
+  const speed      = isBright ? (10 + Math.random() * 6) : (6 + Math.random() * 8);
   const brightness = isBright ? 1.0 : (0.5 + Math.random() * 0.4);
 
-  // Trail geometry: multi-segment line with per-vertex colour and alpha
-  const trailGeo = new THREE.BufferGeometry();
-  const posArr   = new Float32Array(TRAIL_SEGS * 3);
-  const colArr   = new Float32Array(TRAIL_SEGS * 3);
-  const alphaArr = new Float32Array(TRAIL_SEGS);
-  trailGeo.setAttribute('position', new THREE.BufferAttribute(posArr,   3));
-  trailGeo.setAttribute('color',    new THREE.BufferAttribute(colArr,   3));
-  trailGeo.setAttribute('alpha',    new THREE.BufferAttribute(alphaArr, 1));
+  // Pick a random color palette: orange, white, or blue
+  const palette = METEOR_PALETTES[Math.floor(Math.random() * METEOR_PALETTES.length)];
 
-  const trailLine = new THREE.Line(trailGeo, meteorTrailMat);
-  meteorGroup.add(trailLine);
-
-  // Head glow point
+  // Head glow point (3D, rendered through bloom)
   const headGeo = new THREE.BufferGeometry();
   const headPos = new Float32Array(3);
   headGeo.setAttribute('position', new THREE.BufferAttribute(headPos, 3));
-  const headOpUniform = { value: 1.0 };
+  const headOpUniform   = { value: 0.0 }; // starts invisible; set to non-zero only after spawnDelay expires
+  const headCoreUniform = { value: palette.core.clone() };
+  const headHaloUniform = { value: palette.halo.clone() };
   const headMat = new THREE.ShaderMaterial({
-    uniforms: { uOpacity: headOpUniform },
-    vertexShader: meteorHeadMat.vertexShader,
+    uniforms: {
+      uOpacity: headOpUniform,
+      uCoreCol: headCoreUniform,
+      uHaloCol: headHaloUniform,
+    },
+    vertexShader:   meteorHeadMat.vertexShader,
     fragmentShader: meteorHeadMat.fragmentShader,
     transparent: true,
     depthWrite: false,
     blending: THREE.AdditiveBlending,
   });
   const headPts = new THREE.Points(headGeo, headMat);
-  meteorGroup.add(headPts);
+  // NOTE: headPts is NOT added to meteorGroup here.
+  // updateMeteors adds it once spawnDelay reaches zero.
 
   return {
-    trailLine, trailGeo, headPts, headGeo, headOpUniform,
+    headPts, headGeo, headOpUniform,
+    palette,
     start: start.clone(), dir: perp, drift, driftAmt,
-    speed, trailLen, brightness,
-    t: 0, life: (12 + Math.random() * 10) / speed,
+    speed, brightness,
+    t: 0, life: (28 + Math.random() * 20) / speed,
+    // Current and previous NDC positions — used for motion-blur segment in feedback shader
+    ndcPos:      new THREE.Vector2(-10, -10),
+    ndcPosPrev:  new THREE.Vector2(-10, -10),
+    spawnDelay:  0, // seconds to wait before becoming active (used after death)
+    active: true,
   };
 }
 
-// Stagger initial spawns
 for (let i = 0; i < MAX_METEORS; i++) {
   const m = spawnMeteor();
-  m.t = Math.random() * m.life;
+  m.spawnDelay = i * 4 + Math.random() * 4; // stagger initial appearances: ~0s, ~4s, ~8s
   meteors.push(m);
+  // spawnDelay > 0 for all, so none are added to scene yet — updateMeteors handles it
 }
-// Position all geometries before first render to avoid origin flash
-updateMeteors(0);
 
 function updateMeteors(dt) {
   meteors.forEach((m, idx) => {
+    // Count down respawn delay — meteor is invisible and off-screen during this time
+    if (m.spawnDelay > 0) {
+      m.spawnDelay -= dt;
+      if (m.spawnDelay <= 0) {
+        // Delay just expired — add head to scene and start moving
+        meteorGroup.add(m.headPts);
+        positionMeteor(m, 0);
+      }
+      return;
+    }
     m.t += dt;
     if (m.t > m.life) {
-      // Respawn
-      meteorGroup.remove(m.trailLine);
       meteorGroup.remove(m.headPts);
-      m.trailGeo.dispose();
       m.headGeo.dispose();
       m.headPts.material.dispose();
       const nm = spawnMeteor();
+      nm.spawnDelay = 5 + Math.random() * 10; // wait 5–15 s before appearing
       meteors[idx] = nm;
-      // Immediately position new meteor so it never sits at origin
-      positionMeteor(nm, 0);
       return;
     }
-
     positionMeteor(m, dt);
   });
 }
 
 function positionMeteor(m, _dt) {
-    const progress = m.t / m.life;
-    const fade     = Math.sin(progress * Math.PI);
+  const progress = m.t / m.life;
+  const fade     = Math.sin(progress * Math.PI);
 
-    // Compute head position with arc curvature
-    const headPos = m.start.clone()
-      .add(m.dir.clone().multiplyScalar(m.t * m.speed))
-      .add(m.drift.clone().multiplyScalar(m.t * m.t * m.driftAmt));
-    headPos.normalize().multiplyScalar(95 - progress * 3);
+  const headPos3 = m.start.clone()
+    .add(m.dir.clone().multiplyScalar(m.t * m.speed))
+    .add(m.drift.clone().multiplyScalar(m.t * m.t * m.driftAmt));
+  headPos3.normalize().multiplyScalar(95 - progress * 3);
 
-    // Update head glow point
-    const hArr = m.headGeo.attributes.position.array;
-    hArr[0] = headPos.x; hArr[1] = headPos.y; hArr[2] = headPos.z;
-    m.headGeo.attributes.position.needsUpdate = true;
-    m.headOpUniform.value = fade * m.brightness;
+  const hArr = m.headGeo.attributes.position.array;
+  hArr[0] = headPos3.x; hArr[1] = headPos3.y; hArr[2] = headPos3.z;
+  m.headGeo.attributes.position.needsUpdate = true;
+  m.headOpUniform.value = fade * m.brightness;
+}
 
-    // Build trail segments behind the head
-    const posArr   = m.trailGeo.attributes.position.array;
-    const colArr   = m.trailGeo.attributes.color.array;
-    const alphaArr = m.trailGeo.attributes.alpha.array;
+// ─── Meteor feedback trail (screen-space ping-pong) ───────────────────────────
+// Two render targets alternated each frame. The feedback shader reads the
+// previous RT, multiplies by a decay factor, then additively draws a screen-
+// space glow at each meteor head position — exactly like the original Shadertoy.
 
-    for (let s = 0; s < TRAIL_SEGS; s++) {
-      const segT = s / (TRAIL_SEGS - 1); // 0 = head, 1 = tail
-      const offset = segT * m.trailLen;
-      const segPos = headPos.clone()
-        .add(m.dir.clone().multiplyScalar(-offset))
-        .add(m.drift.clone().multiplyScalar(-offset * m.t * m.driftAmt * 0.3));
+const rtParams = {
+  minFilter: THREE.LinearFilter,
+  magFilter: THREE.LinearFilter,
+  format: THREE.RGBAFormat,
+  type: THREE.HalfFloatType,
+};
+let meteorRtA = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight, rtParams);
+let meteorRtB = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight, rtParams);
 
-      posArr[s*3]   = segPos.x;
-      posArr[s*3+1] = segPos.y;
-      posArr[s*3+2] = segPos.z;
+// Uniform array: up to MAX_METEORS NDC positions, opacity, and core color per meteor
+const meteorNdcUniforms   = meteors.map(() => new THREE.Vector2(-10, -10));
+const meteorPrevUniforms  = meteors.map(() => new THREE.Vector2(-10, -10));
+const meteorOpUniforms    = new Array(MAX_METEORS).fill(0);
+const meteorColorUniforms = meteors.map(() => new THREE.Color(1, 1, 1));
 
-      const cR = 1.0;
-      const cG = 1.0 - segT * 0.35;
-      const cB = 1.0 - segT * 0.65;
-      colArr[s*3]   = cR;
-      colArr[s*3+1] = cG;
-      colArr[s*3+2] = cB;
+const meteorFeedbackMat = new THREE.ShaderMaterial({
+  uniforms: {
+    uPrevFrame:    { value: meteorRtA.texture },
+    uResolution:   { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+    uMeteorPos:    { value: meteorNdcUniforms   },
+    uMeteorPrev:   { value: meteorPrevUniforms  },
+    uMeteorOp:     { value: meteorOpUniforms    },
+    uMeteorColor:  { value: meteorColorUniforms },
+    uMeteorCount:  { value: MAX_METEORS },
+  },
+  vertexShader: `void main() { gl_Position = vec4(position.xy, 0.0, 1.0); }`,
+  fragmentShader: `
+    precision highp float;
+    #define MAX_M 3
+    uniform sampler2D uPrevFrame;
+    uniform vec2      uResolution;
+    uniform vec2      uMeteorPos[MAX_M];
+    uniform vec2      uMeteorPrev[MAX_M];
+    uniform float     uMeteorOp[MAX_M];
+    uniform vec3      uMeteorColor[MAX_M];
+    uniform int       uMeteorCount;
 
-      const segAlpha = (1.0 - segT * segT) * fade * m.brightness * 0.85;
-      alphaArr[s] = Math.max(0, segAlpha);
+    // Distance from point p to line segment (a→b), in pixels
+    float segDist(vec2 p, vec2 a, vec2 b) {
+      vec2 ab = b - a;
+      float len2 = dot(ab, ab);
+      if (len2 < 0.0001) return distance(p, a);
+      float t = clamp(dot(p - a, ab) / len2, 0.0, 1.0);
+      return distance(p, a + t * ab);
     }
 
-    m.trailGeo.attributes.position.needsUpdate = true;
-    m.trailGeo.attributes.color.needsUpdate = true;
-    m.trailGeo.attributes.alpha.needsUpdate = true;
-}
+    void main() {
+      vec2 fc   = gl_FragCoord.xy;
+      vec2 uv   = fc / uResolution;
+
+      // Decay previous frame — slow fade so trails linger visibly
+      vec3 col = texture2D(uPrevFrame, uv).rgb * 0.96;
+
+      // Glow radius in pixels — matches effective point size of the 3D head
+      float size = 1.6;
+
+      for (int i = 0; i < MAX_M; i++) {
+        float op = uMeteorOp[i];
+        if (op < 0.005) continue;
+
+        // Convert NDC to pixel coords for both current and previous positions
+        vec2 curr = (uMeteorPos[i]  * 0.5 + 0.5) * uResolution;
+        vec2 prev = (uMeteorPrev[i] * 0.5 + 0.5) * uResolution;
+
+        // Capsule distance: closest point on the motion segment this frame
+        float dist = segDist(fc, prev, curr);
+
+        // Soft Lorentzian glow along the whole segment → motion blur
+        float glow = (size * size) / (dist * dist + size * size);
+
+        // White-hot centre fading to palette colour at edge
+        vec3 tint = mix(vec3(1.0), uMeteorColor[i],
+                        smoothstep(0.0, 1.0, dist / (size * 3.0)));
+        col += tint * glow * op * 0.85;
+      }
+
+      col = min(col, vec3(1.5));
+      gl_FragColor = vec4(col, 1.0);
+    }
+  `,
+  depthTest:  false,
+  depthWrite: false,
+});
+
+// Fullscreen quad for both the feedback pass and the composite blit
+const fsQuadGeo = new THREE.PlaneGeometry(2, 2);
+const meteorFeedbackMesh = new THREE.Mesh(fsQuadGeo, meteorFeedbackMat);
+
+// Composite: blit the feedback RT additively over the final rendered frame
+const meteorCompositeMat = new THREE.ShaderMaterial({
+  uniforms: {
+    uTrail:      { value: meteorRtB.texture },
+    uResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+  },
+  vertexShader: `void main() { gl_Position = vec4(position.xy, 0.0, 1.0); }`,
+  fragmentShader: `
+    precision highp float;
+    uniform sampler2D uTrail;
+    uniform vec2      uResolution;
+    void main() {
+      vec2 uv  = gl_FragCoord.xy / uResolution;
+      vec3 col = texture2D(uTrail, uv).rgb;
+      gl_FragColor = vec4(col, 1.0);
+    }
+  `,
+  transparent: true,
+  blending:    THREE.AdditiveBlending,
+  depthTest:   false,
+  depthWrite:  false,
+});
+const meteorCompositeMesh = new THREE.Mesh(fsQuadGeo, meteorCompositeMat);
+
+// Minimal orthographic scene for fullscreen passes
+const orthoScene  = new THREE.Scene();
+const orthoCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+
+// Clear both RTs on startup so they contain black (not GPU garbage)
+renderer.setRenderTarget(meteorRtA);
+renderer.clear();
+renderer.setRenderTarget(meteorRtB);
+renderer.clear();
+renderer.setRenderTarget(null);
 
 // ─── Resize ───────────────────────────────────────────────────────────────────
 
@@ -1325,6 +1509,10 @@ window.addEventListener('resize', () => {
   composer.setSize(window.innerWidth, window.innerHeight);
   bloomPass.setSize(Math.floor(window.innerWidth / 2), Math.floor(window.innerHeight / 2));
   overlayMat.uniforms.uResolution.value.set(window.innerWidth, window.innerHeight);
+  meteorRtA.setSize(window.innerWidth, window.innerHeight);
+  meteorRtB.setSize(window.innerWidth, window.innerHeight);
+  meteorFeedbackMat.uniforms.uResolution.value.set(window.innerWidth, window.innerHeight);
+  meteorCompositeMat.uniforms.uResolution.value.set(window.innerWidth, window.innerHeight);
 });
 
 // ─── Constellation info panel ─────────────────────────────────────────────────
@@ -1590,9 +1778,61 @@ function animateFixed() {
 
   updateMeteors(dt);
 
+  // ── Project meteor head positions to NDC for feedback shader ───────────────
+  {
+    const projMat = new THREE.Matrix4().multiplyMatrices(
+      camera.projectionMatrix, camera.matrixWorldInverse
+    );
+    const tmpV = new THREE.Vector4();
+    meteors.forEach((m, i) => {
+      // Save last frame's NDC before overwriting
+      meteorPrevUniforms[i].copy(m.ndcPos);
+
+      const arr = m.headGeo.attributes.position.array;
+      tmpV.set(arr[0], arr[1], arr[2], 1.0).applyMatrix4(projMat);
+      const w = tmpV.w;
+      if (w <= 0 || m.headOpUniform.value < 0.001) {
+        m.ndcPos.set(-10, -10);
+        meteorNdcUniforms[i].set(-10, -10);
+        meteorPrevUniforms[i].set(-10, -10); // don't draw a segment to off-screen
+      } else {
+        m.ndcPos.set(tmpV.x / w, tmpV.y / w);
+        meteorNdcUniforms[i].copy(m.ndcPos);
+      }
+      meteorOpUniforms[i] = m.headOpUniform.value;
+      meteorColorUniforms[i].copy(m.palette.core);
+    });
+    meteorFeedbackMat.uniforms.uMeteorOp.value    = meteorOpUniforms;
+    meteorFeedbackMat.uniforms.uMeteorColor.value = meteorColorUniforms;
+  }
+
+  // ── Meteor feedback ping-pong ───────────────────────────────────────────────
+  // 1. Render feedback (prev RT → write to meteorRtB)
+  meteorFeedbackMat.uniforms.uPrevFrame.value = meteorRtA.texture;
+  orthoScene.add(meteorFeedbackMesh);
+  renderer.setRenderTarget(meteorRtB);
+  renderer.autoClear = true;
+  renderer.render(orthoScene, orthoCamera);
+  renderer.autoClear = true;
+  orthoScene.remove(meteorFeedbackMesh);
+
+  // 2. Render 3D scene + bloom to screen
+  renderer.setRenderTarget(null);
   // During a demo camera transition, controls.update() was already called above
   if (!demoActive || demoCamT >= 1.0) controls.update();
   composer.render();
+
+  // 3. Composite feedback trail additively over the finished frame
+  //    Must NOT auto-clear here or we erase the bloom output
+  meteorCompositeMat.uniforms.uTrail.value = meteorRtB.texture;
+  orthoScene.add(meteorCompositeMesh);
+  renderer.autoClear = false;
+  renderer.render(orthoScene, orthoCamera);
+  renderer.autoClear = true;
+  orthoScene.remove(meteorCompositeMesh);
+
+  // Swap ping-pong targets: what we just wrote (meteorRtB) becomes next frame's "prev"
+  const tmp = meteorRtA; meteorRtA = meteorRtB; meteorRtB = tmp;
 }
 
 animateFixed();
