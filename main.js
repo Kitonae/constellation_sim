@@ -693,6 +693,270 @@ const CONSTELLATIONS = [
     ],
     lines: [[1,2],[2,0],[0,3],[2,4],[4,0]],
   },
+
+  // ── Remaining Ptolemaic + mythology-rich constellations ─────────────────────
+
+  {
+    name: 'Hydra',
+    translation: 'The Water Serpent',
+    desc: 'The nine-headed Lernaean Hydra slain by Hercules as his second labour — every head cut off grew back two. He finally cauterised the stumps with fire and buried the immortal head beneath a stone.',
+    color: 0x55ddaa,
+    stars: [
+      [127.57,  5.70, 3.90], // 0 α Hya (Alphard)
+      [130.80,  3.40, 4.30], // 1 υ¹ Hya
+      [138.59, -0.73, 3.11], // 2 ι Hya — actually using ζ
+      [134.62, -8.66, 4.16], // 3 θ Hya — head region
+      [141.90, -1.74, 3.54], // 4 β Hya
+      [171.05,-16.76, 3.83], // 5 γ Hya
+      [178.49,-17.36, 3.89], // 6 π Hya
+      [175.28,-27.96, 4.16], // 7 μ Hya
+    ],
+    lines: [[3,0],[0,1],[1,2],[2,4],[4,5],[5,6],[6,7]],
+  },
+
+  {
+    name: 'Eridanus',
+    translation: 'The River',
+    desc: 'The great celestial river into which Phaëton fell after his disastrous attempt to drive the chariot of the Sun. His sisters, the Heliades, wept so long on its banks that they were transformed into amber-weeping poplar trees.',
+    color: 0x88ccff,
+    stars: [
+      [ 76.96, -5.09, 4.80], // 0 β Eri (Cursa) — head near Orion
+      [ 44.57,-40.30, 2.79], // 1 θ Eri (Acamar)
+      [ 24.43,-57.24, 0.46], // 2 α Eri (Achernar) — tail, south
+      [ 55.81,-23.62, 3.72], // 3 δ Eri (Rana)
+      [ 66.00,-34.02, 3.55], // 4 υ² Eri
+      [ 50.53,-29.77, 3.82], // 5 ε Eri
+    ],
+    lines: [[0,3],[3,5],[5,1],[1,4],[4,2]],
+  },
+
+  {
+    name: 'Cetus',
+    translation: 'The Sea Monster',
+    desc: 'The fearsome sea monster sent by Poseidon to devour Andromeda as punishment for her mother Cassiopeia\'s boastful vanity. It was turned to stone by Perseus when he raised the severed head of Medusa.',
+    color: 0x9988cc,
+    stars: [
+      [ 10.89,  0.33, 2.54], // 0 β Cet (Diphda)
+      [ 45.57,  4.09, 2.53], // 1 α Cet (Menkar)
+      [ 43.83,  3.24, 3.47], // 2 λ Cet
+      [ 26.02, -8.18, 3.56], // 3 η Cet
+      [ 21.01,-10.34, 4.28], // 4 θ Cet
+      [ 30.00, -3.00, 3.74], // 5 ι Cet
+      [ 41.24,  8.46, 3.60], // 6 γ Cet (Kaffaljidhma)
+    ],
+    lines: [[0,4],[4,3],[3,5],[5,0],[1,2],[2,6],[6,1],[2,3]],
+  },
+
+  {
+    name: 'Piscis Austrinus',
+    translation: 'The Southern Fish',
+    desc: 'The great fish that swallowed the waters poured by Aquarius — parent of the two fish of Pisces. In Babylonian myth it was the sacred fish of the god Ea, sovereign of the subterranean sweet waters.',
+    color: 0x66aaff,
+    stars: [
+      [344.41,-29.62, 1.16], // 0 α PsA (Fomalhaut)
+      [340.65,-32.55, 4.17], // 1 β PsA
+      [338.75,-26.04, 4.28], // 2 γ PsA
+      [336.03,-27.04, 4.20], // 3 δ PsA
+      [333.57,-32.99, 4.18], // 4 ε PsA
+      [341.45,-24.30, 5.01], // 5 ι PsA
+    ],
+    lines: [[0,1],[1,4],[4,3],[3,2],[2,5],[5,0],[0,2]],
+  },
+
+  {
+    name: 'Sagitta',
+    translation: 'The Arrow',
+    desc: 'The arrow of Hercules — shot to kill the eagle Aquila that perpetually gnawed the liver of the chained Prometheus. Others say it is one of Eros\'s arrows, or the dart with which Apollo slew the Cyclopes.',
+    color: 0xffdd88,
+    stars: [
+      [296.19, 18.01, 3.82], // 0 γ Sge (tip of arrow)
+      [298.18, 17.48, 3.51], // 1 δ Sge
+      [295.02, 17.48, 4.37], // 2 β Sge
+      [293.31, 18.53, 4.39], // 3 α Sge (tail)
+    ],
+    lines: [[3,2],[2,1],[1,0]],
+  },
+
+  {
+    name: 'Delphinus',
+    translation: 'The Dolphin',
+    desc: 'The dolphin sent by the sea god Poseidon to find the nereid Amphitrite and persuade her to become his bride. Having succeeded in his mission, Poseidon immortalised the faithful messenger among the stars.',
+    color: 0x44ccff,
+    stars: [
+      [309.91, 14.59, 3.77], // 0 β Del (Rotanev)
+      [309.39, 15.91, 3.77], // 1 α Del (Sualocin)
+      [309.91, 15.07, 4.43], // 2 γ Del
+      [311.02, 15.46, 4.72], // 3 δ Del
+      [308.63, 11.30, 4.03], // 4 ε Del
+    ],
+    lines: [[0,1],[1,2],[2,3],[3,0],[0,4]],
+  },
+
+  {
+    name: 'Ara',
+    translation: 'The Altar',
+    desc: 'The altar upon which the Olympian gods swore their oaths of alliance before the Titanomachy — the great war against the Titans. After their victory, Zeus placed this sacred altar in the sky as an eternal reminder.',
+    color: 0xff8844,
+    stars: [
+      [261.35,-49.88, 2.84], // 0 β Ara
+      [262.96,-55.53, 2.95], // 1 α Ara
+      [263.62,-53.16, 3.13], // 2 ζ Ara
+      [257.83,-59.04, 3.34], // 3 ε Ara
+      [265.07,-59.87, 3.62], // 4 γ Ara
+      [270.27,-50.09, 3.66], // 5 δ Ara
+    ],
+    lines: [[0,1],[1,3],[3,4],[4,2],[2,0],[0,5]],
+  },
+
+  {
+    name: 'Corona Australis',
+    translation: 'The Southern Crown',
+    desc: 'The wreath or crown dropped by Sagittarius as he drew his bow — or, in another telling, the crown placed by Dionysus at the foot of the sky to mark where he descended to Hades to retrieve his mother Semele.',
+    color: 0xffcc66,
+    stars: [
+      [285.66,-37.11, 4.10], // 0 α CrA (Alfecca Meridiana)
+      [287.37,-37.90, 4.11], // 1 β CrA
+      [283.82,-38.32, 4.21], // 2 γ CrA
+      [290.17,-40.50, 4.57], // 3 δ CrA
+      [282.52,-37.06, 4.74], // 4 ε CrA
+    ],
+    lines: [[4,2],[2,0],[0,1],[1,3]],
+  },
+
+  {
+    name: 'Triangulum',
+    translation: 'The Triangle',
+    desc: 'The island of Sicily, said by some mythographers to have been placed in the heavens by Ceres to commemorate her beloved island. Others identify it as the Greek letter Delta, symbol of the fertile Nile delta.',
+    color: 0xddccff,
+    stars: [
+      [ 34.84, 34.99, 3.00], // 0 β Tri
+      [ 28.27, 29.58, 3.41], // 1 α Tri (Mothallah)
+      [ 37.61, 33.85, 4.01], // 2 γ Tri
+    ],
+    lines: [[1,0],[0,2],[2,1]],
+  },
+
+  {
+    name: 'Coma Berenices',
+    translation: 'Berenice\'s Hair',
+    desc: 'Queen Berenice II of Egypt sacrificed her beautiful golden hair to Aphrodite as a vow for the safe return of her husband Ptolemy III from war. When the offering vanished from the temple, the court astronomer Conon declared the gods had placed it among the stars.',
+    color: 0xffeeaa,
+    stars: [
+      [197.49, 27.88, 4.26], // 0 β Com
+      [186.73, 17.53, 4.32], // 1 α Com (Diadem)
+      [198.03, 28.27, 4.36], // 2 γ Com
+    ],
+    lines: [[1,0],[0,2]],
+  },
+
+  {
+    name: 'Leo Minor',
+    translation: 'The Little Lion',
+    desc: 'The small lion cub crouching between the great Lion and the Great Bear — placed in the sky by the Polish astronomer Johannes Hevelius in 1687, representing the lion cub offered to Cybele by her devotees in the spring rites.',
+    color: 0xffcc88,
+    stars: [
+      [155.58, 36.71, 3.83], // 0 46 LMi (β LMi)
+      [148.98, 34.22, 4.20], // 1 21 LMi
+      [162.22, 35.25, 4.49], // 2 10 LMi
+      [152.64, 33.80, 5.31], // 3 β LMi
+    ],
+    lines: [[2,1],[1,0],[0,3]],
+  },
+
+  {
+    name: 'Crux',
+    translation: 'The Southern Cross',
+    desc: 'The smallest of the 88 modern constellations, yet one of the most iconic — the Southern Cross has guided sailors across the Pacific and Indian Oceans for millennia. Its four bright stars form a compact cross visible only from the Southern Hemisphere, symbolising the Christian cross in the traditions of Portuguese explorers.',
+    color: 0xaaddff,
+    stars: [
+      [187.79, -57.11, 0.77], // 0 α Cru (Acrux)
+      [191.93, -59.69, 1.25], // 1 β Cru (Mimosa)
+      [187.01, -56.94, 1.59], // 2 γ Cru (Gacrux)
+      [183.79, -58.75, 2.79], // 3 δ Cru
+      [186.65, -63.10, 3.59], // 4 ε Cru
+    ],
+    lines: [[0,2],[1,3],[0,4]],
+  },
+
+  {
+    name: 'Puppis',
+    translation: 'The Stern',
+    desc: 'The stern of the great ship Argo, sailed by Jason and the Argonauts on their quest for the Golden Fleece. When the ancient super-constellation Argo Navis was divided in the 19th century, Puppis claimed the richest portion of the Milky Way — a brilliant sweep of star clusters and nebulae.',
+    color: 0xffddaa,
+    stars: [
+      [110.03, -40.00, 2.21], // 0 ζ Pup (Naos)
+      [116.84, -28.95, 2.70], // 1 π Pup
+      [113.65, -36.13, 2.81], // 2 ρ Pup
+      [108.17, -26.80, 3.17], // 3 τ Pup
+      [119.45, -24.30, 3.25], // 4 ν Pup
+      [111.89, -22.88, 3.34], // 5 σ Pup
+      [122.98, -50.61, 3.73], // 6 L2 Pup (l Pup)
+    ],
+    lines: [[3,1],[1,2],[2,0],[0,6],[3,5],[1,4]],
+  },
+
+  {
+    name: 'Vela',
+    translation: 'The Sails',
+    desc: 'The sails of the Argo, billowing with the breath of Poseidon as the heroes raced toward Colchis. Within Vela lies the Vela Pulsar — the remnant of a supernova that exploded 11,000 years ago, still sweeping its lighthouse beam across the galaxy.',
+    color: 0xbbffdd,
+    stars: [
+      [130.35, -43.43, 1.78], // 0 γ Vel (Regor)
+      [136.00, -47.34, 1.96], // 1 δ Vel (Alsephina)
+      [141.70, -55.01, 2.50], // 2 λ Vel (Suhail)
+      [139.28, -55.17, 2.69], // 3 κ Vel
+      [135.91, -40.47, 3.13], // 4 μ Vel
+      [127.56, -43.18, 3.84], // 5 ξ Vel
+    ],
+    lines: [[5,0],[0,4],[4,1],[1,3],[3,2],[2,3]],
+  },
+
+  {
+    name: 'Carina',
+    translation: 'The Keel',
+    desc: 'The keel of the Argo, the mightiest ship of Greek legend. Carina contains Canopus — the second-brightest star in the night sky, used for millennia as a navigation star and still used today to orient spacecraft. The Carina Nebula within its borders is one of the largest star-forming regions known.',
+    color: 0xffffff,
+    stars: [
+      [ 95.99, -52.70, -0.72], // 0 α Car (Canopus) — brightest in constellation
+      [139.28, -59.52,  1.67], // 1 β Car (Miaplacidus)
+      [125.63, -59.51,  1.86], // 2 ε Car (Avior)
+      [152.09, -64.39,  2.21], // 3 ι Car (Aspidiske / Turais)
+      [160.74, -64.95,  2.76], // 4 θ Car
+      [102.46, -61.68,  2.97], // 5 υ Car
+      [119.19, -52.98,  3.01], // 6 ω Car
+      [138.30, -57.57,  3.40], // 7 q Car
+    ],
+    lines: [[0,5],[5,6],[6,2],[2,7],[7,1],[1,3],[3,4],[4,3]],
+  },
+
+  {
+    name: 'Scutum',
+    translation: 'Sobieski\'s Shield',
+    desc: "Created by the Polish astronomer Johannes Hevelius in 1684 to honour King John III Sobieski of Poland, whose victory at the Battle of Vienna saved Europe from Ottoman conquest. Tiny but rich — the Scutum Star Cloud is one of the densest concentrations of stars visible to the naked eye.",
+    color: 0xffcc66,
+    stars: [
+      [278.80,  -4.75, 3.85], // 0 α Sct
+      [277.07,  -9.95, 4.22], // 1 β Sct
+      [281.15,  -6.27, 4.70], // 2 γ Sct
+      [280.22, -14.56, 4.72], // 3 δ Sct
+      [280.43, -10.87, 4.68], // 4 ε Sct
+    ],
+    lines: [[0,1],[1,3],[3,4],[4,2],[2,0],[1,2]],
+  },
+
+  {
+    name: 'Vulpecula',
+    translation: 'The Little Fox',
+    desc: "Another invention of Hevelius (1687), the Little Fox was originally shown clutching a goose. Though faint and shapeless, it hosts one of astronomy's treasures: the Dumbbell Nebula (M27) — the first planetary nebula ever discovered, a glowing cloud of gas puffed off by a dying star.",
+    color: 0xffaa88,
+    stars: [
+      [294.93, 24.66, 4.44], // 0 α Vul (Anser)
+      [299.30, 21.39, 5.01], // 1 1 Vul
+      [303.41, 22.81, 5.50], // 2 2 Vul (13 Vul)
+      [300.74, 25.10, 4.63], // 3 6 Vul
+    ],
+    lines: [[0,1],[1,2],[0,3],[3,2]],
+  },
 ];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -1218,7 +1482,7 @@ CONSTELLATIONS.forEach(con => {
 // to NDC and upload them as uniforms. The shader draws sparkles + glowing lines
 // between connected stars, adapted from the Art Of Code tutorial shader.
 
-const CON_COUNT = CONSTELLATIONS.length; // 40
+const CON_COUNT = CONSTELLATIONS.length; // 57
 
 // Flat layout: all constellations' stars/lines concatenated.
 const starOffsets = [];
@@ -1289,7 +1553,7 @@ const overlayMat = new THREE.ShaderMaterial({
   fragmentShader: `
     precision highp float;
     #define S smoothstep
-    #define NUM_CONS 40
+    #define NUM_CONS 57
 
     uniform float     uTime;
     uniform vec2      uResolution;
