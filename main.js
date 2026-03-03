@@ -182,6 +182,134 @@ const CONSTELLATIONS = [
     ],
     lines: [[1,4],[4,6],[6,7],[7,5],[5,2],[0,3],[3,4],[3,7],[0,1]],
   },
+  {
+    name: 'Taurus',
+    translation: 'The Bull',
+    desc: 'Zeus transformed into a magnificent white bull to carry Europa across the sea to Crete.',
+    color: 0xffaa66,
+    stars: [
+      [ 68.98, 16.51, 0.85], // 0 Aldebaran
+      [ 81.57, 28.61, 1.65], // 1 Elnath
+      [ 84.41, 21.14, 3.00], // 2 Tianguan (Zeta Tau)
+      [ 60.17, 12.49, 3.65], // 3 Prima Hyadum (Gamma Tau)
+      [ 61.42, 15.96, 3.76], // 4 Hyadum II (Delta1 Tau)
+      [ 67.15, 19.18, 3.53], // 5 Ain (Epsilon Tau)
+      [ 56.87, 24.11, 2.87], // 6 Alcyone (Eta Tau / Pleiades)
+    ],
+    lines: [[3,4],[4,5],[5,0],[0,1],[1,2],[5,6]],
+  },
+  {
+    name: 'Aquila',
+    translation: 'The Eagle',
+    desc: 'The eagle that carried Zeus\'s thunderbolts, or bore Ganymede up to Olympus to serve the gods.',
+    color: 0xccddff,
+    stars: [
+      [297.70,  8.87, 0.76], // 0 Altair
+      [296.56, 10.61, 2.72], // 1 Tarazed
+      [298.83,  6.41, 3.71], // 2 Alshain
+      [299.69,  3.11, 3.36], // 3 Delta Aql
+      [284.74, -4.88, 3.44], // 4 Lambda Aql
+      [286.35, 13.86, 2.99], // 5 Zeta Aql
+    ],
+    lines: [[4,3],[3,0],[0,1],[1,5],[0,2]],
+  },
+  {
+    name: 'Canis Major',
+    translation: 'The Greater Dog',
+    desc: 'Orion\'s faithful hunting hound, led by Sirius — the brightest star in all the night sky.',
+    color: 0xaaccff,
+    stars: [
+      [101.29, -16.72, -1.46], // 0 Sirius
+      [ 95.67, -17.96,  1.98], // 1 Mirzam
+      [ 97.20, -15.63,  4.11], // 2 Muliphein
+      [107.10, -26.39,  1.84], // 3 Wezen
+      [104.66, -28.97,  1.50], // 4 Adhara
+      [100.10, -30.06,  3.02], // 5 Furud
+      [111.02, -29.30,  2.45], // 6 Aludra
+    ],
+    lines: [[1,0],[0,2],[2,3],[3,6],[3,4],[4,5]],
+  },
+  {
+    name: 'Perseus',
+    translation: 'The Hero',
+    desc: 'The slayer of Medusa, who rescued Andromeda from the sea monster Cetus by turning it to stone.',
+    color: 0xddaaff,
+    stars: [
+      [ 51.08, 49.86, 1.79], // 0 Mirfak
+      [ 47.04, 40.96, 2.12], // 1 Algol
+      [ 59.46, 40.01, 2.85], // 2 Menkib (Zeta Per)
+      [ 55.73, 47.79, 3.01], // 3 Delta Per
+      [ 57.91, 40.03, 2.90], // 4 Epsilon Per
+      [ 46.29, 53.51, 2.84], // 5 Gamma Per
+      [ 44.11, 47.71, 3.85], // 6 Kappa Per
+    ],
+    lines: [[5,0],[0,3],[3,4],[4,2],[0,6],[6,1],[1,4]],
+  },
+  {
+    name: 'Draco',
+    translation: 'The Dragon',
+    desc: 'Ladon, the sleepless dragon who guarded the golden apples in the Garden of the Hesperides.',
+    color: 0x88ddaa,
+    stars: [
+      [269.15, 51.49, 2.24], // 0 Eltanin
+      [262.61, 52.30, 2.79], // 1 Rastaban
+      [268.38, 56.87, 3.75], // 2 Grumium (Xi Dra)
+      [211.10, 64.38, 3.65], // 3 Thuban
+      [228.07, 68.77, 3.17], // 4 Edasich (Iota Dra)
+      [245.16, 61.51, 2.74], // 5 Eta Dra
+      [257.20, 65.71, 3.07], // 6 Aldhibah (Zeta Dra)
+      [236.01, 58.97, 3.29], // 7 Chi Dra
+    ],
+    lines: [[0,1],[1,2],[2,6],[6,5],[5,7],[7,4],[4,3]],
+  },
+  {
+    name: 'Sagittarius',
+    translation: 'The Archer',
+    desc: 'The wise centaur Chiron, aiming his arrow at Scorpius — his bow points toward the heart of the galaxy.',
+    color: 0xff9966,
+    stars: [
+      [276.04, -34.38, 1.79], // 0 Kaus Australis (Eps Sgr)
+      [283.82, -26.30, 2.05], // 1 Nunki (Sigma Sgr)
+      [284.43, -29.88, 2.60], // 2 Ascella (Zeta Sgr)
+      [275.25, -29.83, 2.72], // 3 Kaus Media (Delta Sgr)
+      [273.44, -25.42, 2.82], // 4 Kaus Borealis (Lambda Sgr)
+      [271.45, -30.42, 2.99], // 5 Nash (Gamma Sgr)
+      [290.97, -40.62, 3.97], // 6 Rukbat (Alpha Sgr)
+      [286.74, -44.80, 3.93], // 7 Arkab (Beta1 Sgr)
+    ],
+    lines: [[5,3],[3,0],[0,2],[2,1],[1,4],[4,3],[2,7],[7,6]],
+  },
+  {
+    name: 'Virgo',
+    translation: 'The Maiden',
+    desc: 'Astraea, goddess of innocence and justice, the last immortal to abandon the Earth in the Age of Iron.',
+    color: 0xeedd99,
+    stars: [
+      [201.30, -11.16, 0.98], // 0 Spica
+      [177.67,  1.76,  3.59], // 1 Zavijava (Beta Vir)
+      [190.42, -1.45,  2.74], // 2 Porrima (Gamma Vir)
+      [184.98, -0.67,  3.38], // 3 Auva (Delta Vir)
+      [195.54, 10.96,  2.83], // 4 Vindemiatrix (Eps Vir)
+      [203.67, -5.54,  3.37], // 5 Heze (Zeta Vir)
+    ],
+    lines: [[1,3],[3,2],[2,0],[0,5],[2,4]],
+  },
+  {
+    name: 'Aquarius',
+    translation: 'The Water-Bearer',
+    desc: 'Ganymede, the beautiful youth carried to Olympus by Zeus\'s eagle to pour nectar for the gods.',
+    color: 0x88ccdd,
+    stars: [
+      [322.89, -5.57,  2.90], // 0 Sadalsuud (Beta Aqr)
+      [331.45,  0.32,  2.95], // 1 Sadalmelik (Alpha Aqr)
+      [343.66, -15.82, 3.27], // 2 Skat (Delta Aqr)
+      [334.21, -0.32,  3.84], // 3 Sadachbia (Gamma Aqr)
+      [325.02, -9.49,  3.77], // 4 Albali (Epsilon Aqr)
+      [339.39, -7.58,  3.74], // 5 Lambda Aqr
+      [338.96, -13.59, 4.16], // 6 Ancha (Theta Aqr)
+    ],
+    lines: [[4,0],[0,1],[1,3],[3,5],[5,6],[6,2]],
+  },
 ];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -817,8 +945,8 @@ CONSTELLATIONS.forEach(con => {
 // to NDC and upload them as uniforms. The shader draws sparkles + glowing lines
 // between connected stars, adapted from the Art Of Code tutorial shader.
 
-const CON_MAX_STARS = 64;
-const CON_MAX_LINES = 64;
+const CON_MAX_STARS = 128;
+const CON_MAX_LINES = 128;
 const CON_COUNT     = CONSTELLATIONS.length; // 8
 
 // Build static line endpoint index arrays (flat, padded to CON_MAX_LINES each
@@ -882,9 +1010,9 @@ const overlayMat = new THREE.ShaderMaterial({
   fragmentShader: `
     precision highp float;
     #define S smoothstep
-    #define NUM_CONS  8
-    #define MAX_STARS 64
-    #define MAX_LINES 64
+    #define NUM_CONS  16
+    #define MAX_STARS 128
+    #define MAX_LINES 128
 
     uniform float uTime;
     uniform vec2  uResolution;
@@ -1435,12 +1563,18 @@ function animateFixed() {
       if (d > bestDot) { bestDot = d; bestIndex = i; }
     });
     if (bestIndex !== -1) {
+      // Dim all but the focused constellation
+      constellationObjects.forEach((obj, i) => {
+        obj.dimTarget = (i === bestIndex) ? 1.0 : 0.06;
+      });
       if (infoIndex === -1 && !infoFadeOut) {
         showConstellationInfo(bestIndex);
       } else if (bestIndex !== infoIndex && !infoFadeOut) {
         hideConstellationInfo(() => showConstellationInfo(bestIndex));
       }
     } else {
+      // Nothing focused — restore all to full brightness
+      constellationObjects.forEach(obj => { obj.dimTarget = 1.0; });
       if (infoIndex !== -1 && !infoFadeOut) {
         hideConstellationInfo(() => { infoIndex = -1; });
       }
