@@ -435,6 +435,263 @@ const CONSTELLATIONS = [
     ],
     lines: [[0,1],[1,2],[2,6],[6,3],[3,4],[4,5],[5,7]],
   },
+
+  // ── 16 new constellations ────────────────────────────────────────────────
+
+  {
+    name: 'Cancer',
+    translation: 'The Crab',
+    desc: 'Sent by Hera to distract Hercules during his battle with the Lernaean Hydra. Though it was crushed underfoot, Hera immortalised the loyal crab among the stars.',
+    color: 0xffddaa,
+    stars: [
+      [124.63, 27.98, 3.52], // 0 β Cnc (Altarf)
+      [131.17, 28.76, 3.94], // 1 δ Cnc (Asellus Australis)
+      [129.69, 21.47, 4.25], // 2 η Cnc
+      [127.65, 28.46, 4.02], // 3 γ Cnc (Asellus Borealis)
+      [130.82, 11.86, 4.67], // 4 α Cnc (Acubens)
+      [132.08, 17.65, 5.14], // 5 ι Cnc
+    ],
+    lines: [[0,1],[1,3],[3,2],[1,4],[4,5]],
+  },
+
+  {
+    name: 'Libra',
+    translation: 'The Scales',
+    desc: 'The scales of Astraea, goddess of justice, who was the last immortal to live among mortals before ascending to become Virgo. Libra is the only zodiac sign represented by an inanimate object.',
+    color: 0xaaffcc,
+    stars: [
+      [222.72, -16.04, 2.61], // 0 β Lib (Zubeneschamali)
+      [216.54, -25.28, 2.75], // 1 α Lib (Zubenelgenubi)
+      [233.88, -29.78, 3.29], // 2 σ Lib
+      [229.25, -20.16, 3.91], // 3 γ Lib
+      [226.02, -14.79, 4.43], // 4 υ Lib
+    ],
+    lines: [[0,1],[1,2],[2,3],[3,0],[3,4]],
+  },
+
+  {
+    name: 'Capricornus',
+    translation: 'The Sea Goat',
+    desc: 'The god Pan, fleeing the monster Typhon, leapt into the Nile and transformed himself into a goat-fish — half goat, half fish. Zeus later placed him among the stars in commemoration.',
+    color: 0x99ccff,
+    stars: [
+      [304.51, -12.51, 3.57], // 0 δ Cap (Deneb Algedi)
+      [305.25, -14.78, 3.08], // 1 β Cap (Dabih)
+      [321.67, -16.66, 3.68], // 2 γ Cap (Nashira)
+      [325.02, -21.02, 4.27], // 3 ι Cap
+      [311.52, -25.27, 4.08], // 4 ζ Cap
+      [307.60, -27.04, 4.84], // 5 θ Cap
+      [306.41, -14.04, 3.58], // 6 α Cap (Algedi)
+    ],
+    lines: [[6,1],[1,0],[0,2],[2,3],[3,4],[4,5],[5,6]],
+  },
+
+  {
+    name: 'Auriga',
+    translation: 'The Charioteer',
+    desc: 'The lame craftsman Erichthonius, son of Hephaestus, who invented the four-horse chariot to compensate for his disability. His ingenuity so impressed Zeus that he was placed among the stars.',
+    color: 0xffee88,
+    stars: [
+      [ 79.17, 45.99, 0.08], // 0 α Aur (Capella)
+      [ 89.93, 44.95, 1.90], // 1 β Aur (Menkalinan)
+      [ 92.68, 33.17, 2.69], // 2 θ Aur
+      [ 74.25, 33.17, 2.99], // 3 ι Aur (Hassaleh)
+      [ 75.49, 41.23, 3.18], // 4 ε Aur (Almaaz)
+      [ 76.63, 37.21, 3.96], // 5 ζ Aur
+    ],
+    lines: [[0,1],[1,2],[2,3],[3,4],[4,0],[3,5],[5,0]],
+  },
+
+  {
+    name: 'Ophiuchus',
+    translation: 'The Serpent Bearer',
+    desc: 'Asclepius, the great healer who learned the secret of resurrection from a serpent. Zeus struck him down with a thunderbolt to preserve the natural order of life and death, then honoured him with a place in the heavens.',
+    color: 0x88ffaa,
+    stars: [
+      [263.73,  12.56, 2.08], // 0 α Oph (Rasalhague)
+      [265.87,   4.37, 2.77], // 1 η Oph (Sabik)
+      [247.73,  -3.69, 2.43], // 2 ζ Oph (Han)
+      [258.84,  14.39, 2.76], // 3 β Oph (Cebalrai)
+      [249.29,  -8.37, 3.20], // 4 δ Oph (Yed Prior)
+      [251.45,  -3.37, 3.24], // 5 ε Oph (Yed Posterior)
+      [270.19,   9.38, 3.73], // 6 κ Oph
+      [262.69,  25.34, 3.75], // 7 λ Oph
+    ],
+    lines: [[0,3],[3,7],[7,0],[0,6],[6,1],[1,5],[5,4],[4,2],[2,1]],
+  },
+
+  {
+    name: 'Serpens',
+    translation: 'The Serpent',
+    desc: 'The great serpent held by Ophiuchus — Asclepius\'s sacred healing snake. Its image became the caduceus, symbol of medicine, carried by Hermes and adorning healers to this day.',
+    color: 0x99ffdd,
+    stars: [
+      [237.39,   6.43, 2.65], // 0 α Ser (Unukalhai)
+      [240.80,  10.54, 3.26], // 1 δ Ser
+      [243.44,  -3.43, 3.54], // 2 ε Ser
+      [239.11,  15.66, 3.67], // 3 β Ser
+      [234.26,   3.42, 3.85], // 4 γ Ser
+      [241.69,  -2.90, 3.71], // 5 μ Ser
+    ],
+    lines: [[3,1],[1,0],[0,4],[4,2],[2,5],[5,1]],
+  },
+
+  {
+    name: 'Corvus',
+    translation: 'The Crow',
+    desc: 'Apollo\'s sacred crow, once white as snow, was turned black as punishment for bearing bad news — that the god\'s beloved Coronis had been unfaithful. The crow and his cup, Crater, were cast together into the sky.',
+    color: 0xffaa66,
+    stars: [
+      [187.47, -16.52, 2.59], // 0 γ Crv (Gienah)
+      [183.95, -17.54, 2.65], // 1 β Crv (Kraz)
+      [187.01, -22.62, 3.02], // 2 δ Crv (Algorab)
+      [182.10, -24.73, 4.02], // 3 ε Crv
+      [184.98, -12.35, 4.31], // 4 α Crv (Alchiba)
+    ],
+    lines: [[4,0],[0,2],[2,3],[3,1],[1,0]],
+  },
+
+  {
+    name: 'Crater',
+    translation: 'The Cup',
+    desc: 'The golden goblet of Apollo, placed in the sky alongside Corvus the crow. The crow was sent to fetch water in the cup but dawdled; Apollo, enraged at the delay, flung both cup and crow into the heavens.',
+    color: 0xcc99ff,
+    stars: [
+      [164.94, -18.30, 3.56], // 0 δ Crt (Labrum)
+      [163.14, -14.78, 4.08], // 1 γ Crt (Al Sharatan)
+      [166.19, -22.83, 4.46], // 2 ε Crt
+      [167.91, -11.61, 4.70], // 3 β Crt
+      [157.61, -18.70, 4.76], // 4 α Crt (Alkes)
+      [172.53, -22.23, 4.83], // 5 ζ Crt
+    ],
+    lines: [[4,1],[1,0],[0,2],[2,5],[1,3],[3,0]],
+  },
+
+  {
+    name: 'Centaurus',
+    translation: 'The Centaur',
+    desc: 'The wise centaur Chiron, tutor of heroes — teacher of Achilles, Jason, and Asclepius. Accidentally wounded by a poisoned arrow, the immortal Chiron chose death to escape eternal pain, and Zeus set him among the stars.',
+    color: 0xffcc88,
+    stars: [
+      [219.90, -60.84, -0.01], // 0 α Cen (Rigil Kentaurus)
+      [210.96, -60.37,  0.61], // 1 β Cen (Hadar)
+      [204.97, -53.47,  2.17], // 2 ε Cen
+      [182.09, -50.72,  2.20], // 3 η Cen
+      [189.30, -48.96,  2.30], // 4 ζ Cen
+      [211.67, -54.49,  2.55], // 5 γ Cen
+      [224.79, -42.16,  2.75], // 6 δ Cen
+      [231.23, -40.65,  3.13], // 7 ι Cen
+    ],
+    lines: [[0,1],[1,5],[5,4],[4,3],[3,2],[2,4],[1,6],[6,7],[0,5]],
+  },
+
+  {
+    name: 'Lupus',
+    translation: 'The Wolf',
+    desc: 'An unnamed beast impaled on the spear of Centaurus, offered as a sacrifice on the altar Ara. In later traditions it became a wolf — the untameable predator of the southern sky.',
+    color: 0xff8866,
+    stars: [
+      [220.48, -47.39, 2.30], // 0 α Lup (Men)
+      [224.63, -43.13, 2.68], // 1 β Lup
+      [228.19, -47.39, 3.22], // 2 γ Lup
+      [234.23, -41.17, 3.37], // 3 δ Lup
+      [237.82, -33.63, 3.56], // 4 ε Lup
+      [236.99, -38.40, 4.05], // 5 ζ Lup
+      [236.01, -34.71, 3.41], // 6 η Lup
+    ],
+    lines: [[0,1],[1,2],[2,3],[3,4],[4,6],[6,5],[5,3],[0,2]],
+  },
+
+  {
+    name: 'Columba',
+    translation: 'The Dove',
+    desc: 'The dove released by Noah to seek land after the great flood — or in other tellings, the scout dove sent ahead of the Argo by Jason to test the passage between the Clashing Rocks.',
+    color: 0xaaddff,
+    stars: [
+      [ 84.91, -34.07, 2.65], // 0 α Col (Phact)
+      [ 86.74, -35.77, 3.12], // 1 β Col (Wezn)
+      [ 88.60, -33.44, 3.85], // 2 γ Col
+      [ 84.34, -40.00, 3.87], // 3 δ Col
+      [ 93.63, -42.82, 4.36], // 4 ε Col
+    ],
+    lines: [[0,1],[1,2],[0,3],[3,4],[1,3]],
+  },
+
+  {
+    name: 'Lepus',
+    translation: 'The Hare',
+    desc: 'The swift hare crouching beneath the feet of Orion, perpetually hunted by Canis Major. Some say it was placed here by Hermes to honour the animal\'s legendary speed and cleverness.',
+    color: 0xddbb88,
+    stars: [
+      [ 83.18, -17.82, 2.58], // 0 α Lep (Arneb)
+      [ 82.06, -20.76, 2.84], // 1 β Lep (Nihal)
+      [ 87.20, -16.21, 3.59], // 2 γ Lep
+      [ 88.59, -20.88, 3.76], // 3 δ Lep
+      [ 76.36, -22.37, 3.71], // 4 ε Lep
+      [ 71.83, -22.45, 4.29], // 5 μ Lep
+    ],
+    lines: [[5,4],[4,0],[0,1],[1,3],[3,2],[2,0],[1,4]],
+  },
+
+  {
+    name: 'Monoceros',
+    translation: 'The Unicorn',
+    desc: 'The elusive unicorn threading between the great dogs of Orion. First charted by the Dutch cartographer Petrus Plancius in 1612, it inhabits the rich star fields of the Milky Way\'s winter band.',
+    color: 0xeeddff,
+    stars: [
+      [110.03,  -9.55, 3.93], // 0 β Mon A (Muliphein area)
+      [113.57,  -8.93, 4.15], // 1 γ Mon
+      [107.45,  -6.27, 4.48], // 2 δ Mon
+      [102.64,  -0.49, 4.50], // 3 α Mon
+      [116.66, -13.17, 4.34], // 4 ε Mon
+      [108.80, -11.24, 3.93], // 5 β Mon B
+    ],
+    lines: [[3,2],[2,0],[0,5],[5,1],[1,4],[0,1]],
+  },
+
+  {
+    name: 'Canis Minor',
+    translation: 'The Little Dog',
+    desc: 'The faithful smaller hound of Orion — some say it is Maera, the dog of Icarius who discovered his master\'s body and led his daughter Erigone to the grave. Its brightest star Procyon heralds the rising of Canis Major.',
+    color: 0xffeecc,
+    stars: [
+      [114.83,  5.23, 0.40], // 0 α CMi (Procyon)
+      [111.79,  8.29, 2.89], // 1 β CMi (Gomeisa)
+      [116.23,  3.90, 4.33], // 2 γ CMi
+    ],
+    lines: [[1,0],[0,2]],
+  },
+
+  {
+    name: 'Cepheus',
+    translation: 'The King',
+    desc: 'King of Ethiopia, husband of Cassiopeia and father of Andromeda. After his vain wife\'s boasting endangered their daughter, he negotiated with Poseidon — too late. Perseus saved Andromeda, and all three royals were set among the stars.',
+    color: 0xaaccff,
+    stars: [
+      [332.16, 70.56, 2.44], // 0 α Cep (Alderamin)
+      [322.16, 77.63, 3.23], // 1 β Cep (Alfirk)
+      [340.67, 66.20, 3.21], // 2 γ Cep (Errai)
+      [354.84, 77.63, 3.52], // 3 ζ Cep
+      [338.96, 61.84, 4.07], // 4 δ Cep
+      [325.33, 68.11, 4.40], // 5 ι Cep
+    ],
+    lines: [[0,1],[1,3],[3,2],[2,4],[4,0],[0,5],[5,1]],
+  },
+
+  {
+    name: 'Fornax',
+    translation: 'The Furnace',
+    desc: 'Named by the French astronomer Nicolas Louis de Lacaille to honour the chemical furnace — the athanor — used by alchemists and early chemists. It occupies a dark patch of sky rich in distant galaxies, including the Fornax Cluster.',
+    color: 0xff9944,
+    stars: [
+      [ 48.02, -28.99, 3.80], // 0 α For (Dalim)
+      [ 40.72, -32.41, 4.46], // 1 β For
+      [ 45.42, -30.00, 4.69], // 2 γ For
+      [ 55.94, -28.23, 4.81], // 3 δ For
+      [ 44.17, -27.07, 5.19], // 4 ε For
+    ],
+    lines: [[1,2],[2,0],[0,3],[2,4],[4,0]],
+  },
 ];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -1048,19 +1305,9 @@ CONSTELLATIONS.forEach(con => {
 // to NDC and upload them as uniforms. The shader draws sparkles + glowing lines
 // between connected stars, adapted from the Art Of Code tutorial shader.
 
-const CON_MAX_STARS = 256;
-const CON_MAX_LINES = 256;
-const CON_COUNT     = CONSTELLATIONS.length; // 8
+const CON_COUNT = CONSTELLATIONS.length; // 40
 
-// Build static line endpoint index arrays (flat, padded to CON_MAX_LINES each
-// constellation). We'll encode them as vec2 (floats) since GLSL ES 1.0 on some
-// WebGL1 drivers has limited ivec support.
-// Layout: for constellation c, line l → index (c * CON_MAX_LINES + l)
-// We store line pairs as separate float arrays: uLineA[64*8], uLineB[64*8].
-// But WebGL uniform arrays have size limits, so instead pack per-constellation:
-// uStarCount[8], uLineCount[8], uLineA[64], uLineB[64] with star offsets.
-
-// Flat layout: all constellations' stars concatenated; starOffset[c] = start index.
+// Flat layout: all constellations' stars/lines concatenated.
 const starOffsets = [];
 const lineOffsets = [];
 let totalStars = 0, totalLines = 0;
@@ -1071,20 +1318,39 @@ CONSTELLATIONS.forEach(con => {
   totalLines += con.lines.length;
 });
 
-// Static line index arrays (flat over all constellations, absolute star indices)
-const lineAArr = new Array(CON_MAX_LINES).fill(0);
-const lineBArr = new Array(CON_MAX_LINES).fill(0);
+// ── Data textures (avoid blowing the MAX_FRAGMENT_UNIFORM_VECTORS limit) ──
+// starPosTex  : RGBA32F, width=totalStars, height=1 — rg = NDC xy, updated each frame
+// linesTex    : RGBA32F, width=totalLines, height=1 — r=starIndexA, g=starIndexB, static
+
+// Star position texture — pixels written every frame in the animation loop
+const starPosData  = new Float32Array(totalStars * 4).fill(-10); // init off-screen
+const starPosTex   = new THREE.DataTexture(
+  starPosData, totalStars, 1,
+  THREE.RGBAFormat, THREE.FloatType
+);
+starPosTex.magFilter = THREE.NearestFilter;
+starPosTex.minFilter = THREE.NearestFilter;
+starPosTex.needsUpdate = true;
+
+// Lines texture — static, built once
+const lineData = new Float32Array(totalLines * 4);
 CONSTELLATIONS.forEach((con, ci) => {
-  const off = lineOffsets[ci];
+  const lOff = lineOffsets[ci];
   const sOff = starOffsets[ci];
   con.lines.forEach(([a, b], li) => {
-    lineAArr[off + li] = sOff + a;
-    lineBArr[off + li] = sOff + b;
+    const px = (lOff + li) * 4;
+    lineData[px]     = sOff + a; // absolute star index A
+    lineData[px + 1] = sOff + b; // absolute star index B
   });
 });
+const linesTex = new THREE.DataTexture(
+  lineData, totalLines, 1,
+  THREE.RGBAFormat, THREE.FloatType
+);
+linesTex.magFilter = THREE.NearestFilter;
+linesTex.minFilter = THREE.NearestFilter;
+linesTex.needsUpdate = true;
 
-// Mutable screen-space positions updated each frame (vec2 NDC per star)
-const starScreenPos = new Array(CON_MAX_STARS).fill(null).map(() => new THREE.Vector2(0, 0));
 // Per-constellation dim value for demo mode (starts at 1.0)
 const conDimArr = new Array(CON_COUNT).fill(1.0);
 
@@ -1092,12 +1358,9 @@ const overlayMat = new THREE.ShaderMaterial({
   uniforms: {
     uTime:       { value: 0 },
     uResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
-    // Per-star screen positions (NDC -1..1 space, y up)
-    uStarPos:    { value: starScreenPos },
-    // Flat line connectivity (absolute star indices into uStarPos)
-    uLineA:      { value: lineAArr.slice() },
-    uLineB:      { value: lineBArr.slice() },
-    // Per-constellation metadata
+    uStarPos:    { value: starPosTex },   // data texture: NDC xy per star
+    uLines:      { value: linesTex },     // data texture: (starIdxA, starIdxB) per line
+    // Per-constellation metadata — 40 elements each, well within uniform budget
     uStarOffset: { value: starOffsets.slice() },
     uLineOffset: { value: lineOffsets.slice() },
     uStarCount:  { value: CONSTELLATIONS.map(c => c.stars.length) },
@@ -1113,23 +1376,24 @@ const overlayMat = new THREE.ShaderMaterial({
   fragmentShader: `
     precision highp float;
     #define S smoothstep
-    #define NUM_CONS  24
-    #define MAX_STARS 256
-    #define MAX_LINES 256
+    #define NUM_CONS 40
 
-    uniform float uTime;
-    uniform vec2  uResolution;
-    uniform vec2  uStarPos[MAX_STARS];
-    uniform float uLineA[MAX_LINES];
-    uniform float uLineB[MAX_LINES];
-    uniform int   uStarOffset[NUM_CONS];
-    uniform int   uLineOffset[NUM_CONS];
-    uniform int   uStarCount[NUM_CONS];
-    uniform int   uLineCount[NUM_CONS];
+    uniform float     uTime;
+    uniform vec2      uResolution;
+    uniform sampler2D uStarPos;   // texel i → star i NDC xy in .rg
+    uniform sampler2D uLines;     // texel i → line i (starIdxA, starIdxB) in .rg
+    uniform int  uStarOffset[NUM_CONS];
+    uniform int  uLineOffset[NUM_CONS];
+    uniform int  uStarCount[NUM_CONS];
+    uniform int  uLineCount[NUM_CONS];
     uniform vec3  uConColor[NUM_CONS];
     uniform float uConDim[NUM_CONS];
 
     out vec4 outColor;
+
+    vec2 fetchStarPos(int idx) {
+      return texelFetch(uStarPos, ivec2(idx, 0), 0).rg;
+    }
 
     float DistLine(vec2 p, vec2 a, vec2 b) {
       vec2 pa = p - a;
@@ -1149,7 +1413,10 @@ const overlayMat = new THREE.ShaderMaterial({
     }
 
     float Sparkle(vec2 p, vec2 center, float t) {
-      vec2  j     = (center - p) * 1400.0;
+      vec2  d2    = center - p;
+      float dist2 = dot(d2, d2);
+      if (dist2 > 0.0003) return 0.0; // hard cutoff — no long-range bleed
+      vec2  j     = d2 * 1400.0;
       float base  = 1.0 / max(dot(j, j), 0.0001);
       float seed  = fract(center.x * 412.3 + center.y * 253.7);
       float pulse = sin(t * 8.0 + seed * 20.0) * 0.5 + 0.5;
@@ -1167,26 +1434,27 @@ const overlayMat = new THREE.ShaderMaterial({
         float dim = uConDim[ci];
         if (dim < 0.001) continue;
 
-        vec3  tint = uConColor[ci];
-        int   sOff = uStarOffset[ci];
-        int   lOff = uLineOffset[ci];
-        int   nS   = uStarCount[ci];
-        int   nL   = uLineCount[ci];
+        vec3 tint = uConColor[ci];
+        int  sOff = uStarOffset[ci];
+        int  lOff = uLineOffset[ci];
+        int  nS   = uStarCount[ci];
+        int  nL   = uLineCount[ci];
 
         float m = 0.0;
 
-        for (int li = 0; li < MAX_LINES; li++) {
-          if (li >= nL) break;
-          int ai = int(uLineA[lOff + li]);
-          int bi = int(uLineB[lOff + li]);
-          vec2 sa = uStarPos[ai] * 0.5; sa.x *= aspect;
-          vec2 sb = uStarPos[bi] * 0.5; sb.x *= aspect;
+        for (int li = 0; li < nL; li++) {
+          vec2 lineAB = texelFetch(uLines, ivec2(lOff + li, 0), 0).rg;
+          vec2 sa = fetchStarPos(int(lineAB.r)) * 0.5; sa.x *= aspect;
+          vec2 sb = fetchStarPos(int(lineAB.g)) * 0.5; sb.x *= aspect;
+          // skip lines where both endpoints are off-screen
+          if (abs(sa.x) > 2.0 && abs(sb.x) > 2.0) continue;
           m += GlowLine(uv, sa, sb);
         }
 
-        for (int si = 0; si < MAX_STARS; si++) {
-          if (si >= nS) break;
-          vec2 sc = uStarPos[sOff + si] * 0.5;
+        for (int si = 0; si < nS; si++) {
+          vec2 raw = fetchStarPos(sOff + si);
+          if (abs(raw.x) > 1.2 || abs(raw.y) > 1.2) continue; // off-screen
+          vec2 sc = raw * 0.5;
           sc.x *= aspect;
           m += Sparkle(uv, sc, uTime);
         }
@@ -1721,15 +1989,16 @@ function animateFixed() {
       obj.worldPositions.forEach(wp => {
         tmpV.set(wp.x, wp.y, wp.z, 1.0).applyMatrix4(projMat);
         const w = tmpV.w;
+        const px = si * 4;
         if (w <= 0) {
-          starScreenPos[si].set(-10, -10);
+          starPosData[px] = -10; starPosData[px + 1] = -10;
         } else {
-          starScreenPos[si].set(tmpV.x / w, tmpV.y / w);
+          starPosData[px] = tmpV.x / w; starPosData[px + 1] = tmpV.y / w;
         }
         si++;
       });
     });
-    // Three.js reads .value by reference for array uniforms — no reassignment needed
+    starPosTex.needsUpdate = true;
   }
 
   const camDirFromOrigin = camera.position.clone().normalize();
