@@ -37,6 +37,7 @@ const bloomPass = new UnrealBloomPass(
   0.6,
   0.55,
 );
+bloomPass.enabled = true;
 composer.addPass(bloomPass);
 
 // ─── Constellation data ───────────────────────────────────────────────────────
@@ -718,9 +719,6 @@ function seededRand(seed) {
 function addSkyDome() {
   const domeGeo = new THREE.SphereGeometry(560, 32, 32);
   const domeMat = new THREE.ShaderMaterial({
-    uniforms: {
-      uTime: { value: 0 },
-    },
     vertexShader: `
       varying vec3 vWorldPos;
       void main() {
@@ -730,47 +728,23 @@ function addSkyDome() {
       }
     `,
     fragmentShader: `
-      uniform float uTime;
       varying vec3 vWorldPos;
-
-      vec3 skyGradient(float h) {
-        vec3 c0 = vec3(0.020, 0.010, 0.040);
-        vec3 c1 = vec3(0.025, 0.018, 0.070);
-        vec3 c2 = vec3(0.035, 0.050, 0.130);
-        vec3 c3 = vec3(0.045, 0.070, 0.170);
-        vec3 c4 = vec3(0.055, 0.085, 0.195);
-
-        vec3 col = mix(c0, c1, smoothstep(0.00, 0.20, h));
-        col      = mix(col, c2, smoothstep(0.15, 0.45, h));
-        col      = mix(col, c3, smoothstep(0.40, 0.75, h));
-        col      = mix(col, c4, smoothstep(0.70, 1.00, h));
-        return col;
-      }
-
       void main() {
-        vec3 dir = normalize(vWorldPos);
-        float h  = dir.y * 0.5 + 0.5;
-        vec3 base = skyGradient(h);
-
-        float horizonDist = abs(h - 0.48);
-        float horizonGlow = exp(-horizonDist * horizonDist * 80.0);
-        base += vec3(0.030, 0.015, 0.010) * horizonGlow * 0.6;
-        base += vec3(0.005, 0.018, 0.022) * horizonGlow * 0.4;
-
-        float wave1 = 0.5 + 0.5 * sin(uTime * 0.04 + dir.x * 2.5 + dir.z * 1.8);
-        base += vec3(0.012, 0.016, 0.035) * wave1 * (1.0 - h);
-
-        float wave2 = 0.5 + 0.5 * sin(uTime * 0.018 + dir.z * 3.2 - dir.x * 1.5 + 1.7);
-        base += vec3(0.008, 0.005, 0.020) * wave2 * smoothstep(0.0, 0.5, 1.0 - h);
-
-        gl_FragColor = vec4(base, 1.0);
+        // Pure world-space gradient — no screen-space artifacts
+        // h=0 at south pole, h=1 at north pole
+        float h = normalize(vWorldPos).y * 0.5 + 0.5;
+        vec3 bottom = vec3(0.008, 0.005, 0.018);
+        vec3 mid    = vec3(0.012, 0.015, 0.045);
+        vec3 top    = vec3(0.018, 0.025, 0.072);
+        vec3 col = mix(bottom, mid, smoothstep(0.0, 0.5, h));
+        col      = mix(col,    top, smoothstep(0.5, 1.0, h));
+        gl_FragColor = vec4(col, 1.0);
       }
     `,
     side: THREE.BackSide,
     depthWrite: false,
   });
 
-  animatedMaterials.push(domeMat);
   scene.add(new THREE.Mesh(domeGeo, domeMat));
 }
 
@@ -942,68 +916,7 @@ scene.add(createStarField());
   scene.add(new THREE.Points(geo, mat));
 })();
 
-(function addForegroundDust() {
-  const count = 1800;
-  const positions = new Float32Array(count * 3);
-  const sizes = new Float32Array(count);
-  const colors = new Float32Array(count * 3);
-
-  for (let i = 0; i < count; i++) {
-    const theta = Math.random() * Math.PI * 2;
-    const phi = Math.acos(2 * Math.random() - 1);
-    const r = 45 + Math.random() * 30;
-    positions[i * 3] = r * Math.sin(phi) * Math.cos(theta);
-    positions[i * 3 + 1] = r * Math.cos(phi);
-    positions[i * 3 + 2] = r * Math.sin(phi) * Math.sin(theta);
-
-    sizes[i] = 0.35 + Math.random() * 0.9;
-
-    colors[i * 3] = 0.7 + Math.random() * 0.2;
-    colors[i * 3 + 1] = 0.74 + Math.random() * 0.2;
-    colors[i * 3 + 2] = 0.85 + Math.random() * 0.15;
-  }
-
-  const geo = new THREE.BufferGeometry();
-  geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-  geo.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
-  geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-
-  const mat = new THREE.ShaderMaterial({
-    uniforms: { uTime: { value: 0 } },
-    vertexShader: `
-      attribute float size;
-      attribute vec3 color;
-      varying vec3 vColor;
-      varying float vFlicker;
-      uniform float uTime;
-      void main() {
-        vColor = color;
-        vFlicker = 0.75 + 0.25 * sin(uTime * 0.9 + position.x * 0.03 + position.y * 0.04);
-        vec4 mv = modelViewMatrix * vec4(position, 1.0);
-        gl_PointSize = size * (220.0 / -mv.z);
-        gl_Position = projectionMatrix * mv;
-      }
-    `,
-    fragmentShader: `
-      varying vec3 vColor;
-      varying float vFlicker;
-      void main() {
-        float d = length(gl_PointCoord - 0.5);
-        if (d > 0.5) discard;
-        float alpha = exp(-d * d * 12.0) * 0.28 * vFlicker;
-        gl_FragColor = vec4(vColor, alpha);
-      }
-    `,
-    transparent: true,
-    depthWrite: false,
-    blending: THREE.AdditiveBlending,
-  });
-
-  animatedMaterials.push(mat);
-  const cloud = new THREE.Points(geo, mat);
-  cloud.userData.spinSpeed = 0.005;
-  scene.add(cloud);
-})();
+// (foreground dust removed — caused bloom oval artifact at screen center)
 
 // ─── Nebulae (kaliset fractal, localized billboards) ──────────────────────────
 // Based on "Simplicity Galaxy" by CBS (https://www.shadertoy.com/view/MslGWN)
@@ -1403,13 +1316,12 @@ const overlayMat = new THREE.ShaderMaterial({
     }
 
     float GlowLine(vec2 p, vec2 a, vec2 b) {
+      // skip lines where either endpoint is off-screen (behind camera → parked at -5,-5)
+      if (abs(a.x) > 1.8 || abs(a.y) > 1.8 || abs(b.x) > 1.8 || abs(b.y) > 1.8) return 0.0;
       float d    = DistLine(p, a, b);
       float core = S(0.0015, 0.0003, d) * 0.7;
       float glow = S(0.006,  0.002,  d) * 0.15;
-      float m    = core + glow;
-      float len  = length(a - b);
-      m *= S(2.5, 0.1, len);
-      return m;
+      return core + glow;
     }
 
     float Sparkle(vec2 p, vec2 center, float t) {
@@ -1480,8 +1392,7 @@ overlayGeo.setAttribute('position', new THREE.BufferAttribute(
 ));
 const overlayMesh = new THREE.Mesh(overlayGeo, overlayMat);
 overlayMesh.frustumCulled = false;
-overlayMesh.renderOrder   = 999;
-scene.add(overlayMesh);
+// NOT added to scene — rendered directly after bloom to avoid bloom amplifying the overlay
 
 // ─── Shooting stars (meteors) ─────────────────────────────────────────────────
 
@@ -2091,7 +2002,15 @@ function animateFixed() {
   if (!demoActive || demoCamT >= 1.0) controls.update();
   composer.render();
 
-  // 3. Composite feedback trail additively over the finished frame
+  // 3. Render constellation overlay (screen-space lines + sparkles) — AFTER bloom
+  //    so bloom never sees it and can't create a large soft oval artifact
+  renderer.autoClear = false;
+  orthoScene.add(overlayMesh);
+  renderer.render(orthoScene, orthoCamera);
+  orthoScene.remove(overlayMesh);
+  renderer.autoClear = true;
+
+  // 4. Composite feedback trail additively over the finished frame
   //    Must NOT auto-clear here or we erase the bloom output
   meteorCompositeMat.uniforms.uTrail.value = meteorRtB.texture;
   orthoScene.add(meteorCompositeMesh);
