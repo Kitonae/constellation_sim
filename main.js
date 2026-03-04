@@ -1705,175 +1705,44 @@ addNebula(310.36, 45.28, 0x22ccff, 0x7755ee, 32, [0.40, -1.60], 1.6); // Cygnus 
 addNebula(279.23, 38.78, 0x44ffcc, 0x6699ff, 26, [-0.20, -1.10], 2.4); // Lyra      — teal/blue
 addNebula(266.00, -29.00, 0xffaa33, 0xff5511, 50, [2.00, -1.30], 1.4); // Sagittarius — gold/orange
 
-// ─── Constellation rendering ──────────────────────────────────────────────────
+// ─── Constellation rendering (merged geometry — 2 draw calls) ─────────────────
 
 const SPHERE_R = 100;
 
-// Shared twinkle time uniforms per constellation batch
-const conMatUniforms = [];
 const constellationLabels = [];
 const constellationObjects = []; // for demo mode + overlay shader
 
-CONSTELLATIONS.forEach(con => {
+// Count total stars across all constellations for merged buffers
+let totalConStars = 0;
+CONSTELLATIONS.forEach(con => { totalConStars += con.stars.length; });
+
+const mergedPos = new Float32Array(totalConStars * 3);
+const mergedSize = new Float32Array(totalConStars);
+const mergedTwinkOff = new Float32Array(totalConStars);
+const mergedMag = new Float32Array(totalConStars);
+const mergedStarColor = new Float32Array(totalConStars * 3);
+const mergedConIdx = new Float32Array(totalConStars);
+const conDimValues = new Array(CONSTELLATIONS.length).fill(1.0);
+
+let mIdx = 0;
+CONSTELLATIONS.forEach((con, ci) => {
   const col = new THREE.Color(con.color);
   const positions = con.stars.map(([ra, dec]) => raDecToVec3(ra, dec, SPHERE_R));
 
-  // ── Stars ──────────────────────────────────────────────────────────────────
-
-  const nStars = positions.length;
-  const sPosArr = new Float32Array(nStars * 3);
-  const sSizeArr = new Float32Array(nStars);
-  const sTwinkOff = new Float32Array(nStars);
-  const sMagArr = new Float32Array(nStars);
-
   positions.forEach((p, i) => {
-    sPosArr[i * 3] = p.x; sPosArr[i * 3 + 1] = p.y; sPosArr[i * 3 + 2] = p.z;
+    const idx = mIdx + i;
+    mergedPos[idx * 3] = p.x;
+    mergedPos[idx * 3 + 1] = p.y;
+    mergedPos[idx * 3 + 2] = p.z;
     const [, , mag] = con.stars[i];
-    sSizeArr[i] = Math.max(2.5, 7.5 - mag * 1.4);
-    sTwinkOff[i] = seededRand(i * 37 + con.color) * Math.PI * 2;
-    sMagArr[i] = mag;
+    mergedSize[idx] = Math.max(2.5, 7.5 - mag * 1.4);
+    mergedTwinkOff[idx] = seededRand(i * 37 + con.color) * Math.PI * 2;
+    mergedMag[idx] = mag;
+    mergedStarColor[idx * 3] = col.r;
+    mergedStarColor[idx * 3 + 1] = col.g;
+    mergedStarColor[idx * 3 + 2] = col.b;
+    mergedConIdx[idx] = ci;
   });
-
-  const sGeo = new THREE.BufferGeometry();
-  sGeo.setAttribute('position', new THREE.BufferAttribute(sPosArr, 3));
-  sGeo.setAttribute('size', new THREE.BufferAttribute(sSizeArr, 1));
-  sGeo.setAttribute('twinkleOff', new THREE.BufferAttribute(sTwinkOff, 1));
-  sGeo.setAttribute('mag', new THREE.BufferAttribute(sMagArr, 1));
-
-  const uTime = { value: 0 };
-  conMatUniforms.push(uTime);
-
-  // Two-pass: wide soft halo + sharp bright core
-  const uDim = { value: 1.0 };
-  const haloMat = new THREE.ShaderMaterial({
-    uniforms: { starColor: { value: col }, uTime, uDim },
-    vertexShader: `
-      attribute float size;
-      attribute float twinkleOff;
-      attribute float mag;
-      uniform   float uTime;
-      varying   float vTwinkle;
-      varying   float vMag;
-      void main() {
-        vMag = mag;
-        // Layered twinkle: fast shimmer + slow breathe
-        float freq   = 0.6 + fract(twinkleOff * 5.1) * 1.2;
-        // Dim stars twinkle more (atmospheric scintillation)
-        float twinkAmp = 0.15 + 0.20 * smoothstep(0.0, 4.0, mag);
-        float fast = sin(uTime * freq + twinkleOff);
-        float slow = sin(uTime * 0.15 + twinkleOff * 2.3);
-        vTwinkle = (1.0 - twinkAmp) + twinkAmp * (fast * 0.7 + slow * 0.3);
-        // Brighter stars get a larger halo multiplier
-        float haloScale = 3.8 + smoothstep(2.0, 0.0, mag) * 1.2;
-        vec4 mv = modelViewMatrix * vec4(position, 1.0);
-        gl_PointSize = size * haloScale * vTwinkle * (300.0 / -mv.z);
-        gl_Position  = projectionMatrix * mv;
-      }
-    `,
-    fragmentShader: `
-      uniform vec3  starColor;
-      uniform float uDim;
-      varying float vTwinkle;
-      varying float vMag;
-      void main() {
-        float d = length(gl_PointCoord - 0.5);
-        if (d > 0.5) discard;
-        float a = exp(-d * d * 6.0) * 0.35 * vTwinkle * uDim;
-        // Brighter stars get a slightly more saturated halo
-        float brightness = smoothstep(4.0, 0.0, vMag);
-        vec3 col = mix(starColor * 0.8, starColor, brightness);
-        gl_FragColor = vec4(col, a);
-      }
-    `,
-    transparent: true,
-    depthWrite: false,
-    blending: THREE.AdditiveBlending,
-  });
-  scene.add(new THREE.Points(sGeo, haloMat));
-
-  const coreMat = new THREE.ShaderMaterial({
-    uniforms: { starColor: { value: col }, uTime, uDim },
-    vertexShader: `
-      attribute float size;
-      attribute float twinkleOff;
-      attribute float mag;
-      uniform   float uTime;
-      varying   float vTwinkle;
-      varying   float vMag;
-      void main() {
-        vMag = mag;
-        float freq   = 0.6 + fract(twinkleOff * 5.1) * 1.2;
-        float twinkAmp = 0.15 + 0.20 * smoothstep(0.0, 4.0, mag);
-        float fast = sin(uTime * freq + twinkleOff);
-        float slow = sin(uTime * 0.15 + twinkleOff * 2.3);
-        vTwinkle = (1.0 - twinkAmp) + twinkAmp * (fast * 0.7 + slow * 0.3);
-        // Slightly larger core for brighter stars
-        float coreScale = 1.0 + smoothstep(2.0, 0.0, mag) * 0.25;
-        vec4 mv = modelViewMatrix * vec4(position, 1.0);
-        gl_PointSize = size * coreScale * vTwinkle * (300.0 / -mv.z);
-        gl_Position  = projectionMatrix * mv;
-      }
-    `,
-    fragmentShader: `
-      uniform vec3  starColor;
-      uniform float uDim;
-      varying float vTwinkle;
-      varying float vMag;
-      void main() {
-        vec2  uv = gl_PointCoord - 0.5;
-        float d  = length(uv);
-        if (d > 0.5) discard;
-
-        // Core disc
-        float core = exp(-d * d * 30.0);
-        // Soft halo
-        float halo = exp(-d * d * 7.0) * 0.5;
-
-        // 6-point diffraction spikes (3 axes at 60-degree intervals)
-        float spike = 0.0;
-        // Axis 1: horizontal/vertical cross
-        spike += exp(-uv.x*uv.x * 180.0) * exp(-abs(uv.y) * 22.0);
-        spike += exp(-uv.y*uv.y * 180.0) * exp(-abs(uv.x) * 22.0);
-        // Axis 2: rotated 60 degrees
-        float c60 = 0.5;   // cos(60)
-        float s60 = 0.866; // sin(60)
-        vec2 uv60 = vec2(uv.x * c60 + uv.y * s60, -uv.x * s60 + uv.y * c60);
-        spike += exp(-uv60.x*uv60.x * 180.0) * exp(-abs(uv60.y) * 22.0);
-        spike += exp(-uv60.y*uv60.y * 180.0) * exp(-abs(uv60.x) * 22.0);
-        // Axis 3: rotated -60 degrees
-        vec2 uv60n = vec2(uv.x * c60 - uv.y * s60, uv.x * s60 + uv.y * c60);
-        spike += exp(-uv60n.x*uv60n.x * 200.0) * exp(-abs(uv60n.y) * 24.0);
-        spike += exp(-uv60n.y*uv60n.y * 200.0) * exp(-abs(uv60n.x) * 24.0);
-        // Scale spikes by brightness — brighter stars have more prominent spikes
-        float spikeBright = 0.25 + smoothstep(3.0, 0.0, vMag) * 0.25;
-        spike *= spikeBright;
-
-        // Faint Airy ring for bright stars (mag < 1.5)
-        float airy = 0.0;
-        float airyStrength = smoothstep(1.8, 0.0, vMag);
-        if (airyStrength > 0.0) {
-          float ring = abs(d - 0.28);
-          airy = exp(-ring * ring * 800.0) * 0.12 * airyStrength;
-        }
-
-        float a   = (core + halo + spike + airy) * vTwinkle * uDim;
-
-        // Color temperature: bright stars get whiter/hotter cores
-        float tempShift = smoothstep(3.5, 0.0, vMag);
-        vec3  warmCore  = mix(vec3(1.0), vec3(1.0, 0.98, 0.95), 1.0 - tempShift);
-        vec3  col = mix(warmCore, starColor, smoothstep(0.0, 0.3, d));
-
-        gl_FragColor = vec4(col, a);
-      }
-    `,
-    transparent: true,
-    depthWrite: false,
-    blending: THREE.AdditiveBlending,
-  });
-  scene.add(new THREE.Points(sGeo, coreMat));
-
-  animatedMaterials.push(haloMat);
-  animatedMaterials.push(coreMat);
 
   // ── Label sprite ────────────────────────────────────────────────────────────
 
@@ -1906,14 +1775,135 @@ CONSTELLATIONS.forEach(con => {
   ls.userData.normal = centroid.clone().normalize();
   constellationLabels.push(ls);
 
-  // Store star world-space positions and line connectivity for the overlay shader
   constellationObjects.push({
-    haloMat, coreMat, uDim, dimTarget: 1.0, label: ls, centroid: centroid.clone(),
+    uDim: { value: 1.0 }, dimTarget: 1.0, label: ls, centroid: centroid.clone(),
+    centroidDir: centroid.clone().normalize(),
     worldPositions: positions,
     lines: con.lines,
     color: col,
   });
+
+  mIdx += con.stars.length;
 });
+
+// ── Merged geometry ──────────────────────────────────────────────────────────
+
+const mergedGeo = new THREE.BufferGeometry();
+mergedGeo.setAttribute('position', new THREE.BufferAttribute(mergedPos, 3));
+mergedGeo.setAttribute('size', new THREE.BufferAttribute(mergedSize, 1));
+mergedGeo.setAttribute('twinkleOff', new THREE.BufferAttribute(mergedTwinkOff, 1));
+mergedGeo.setAttribute('mag', new THREE.BufferAttribute(mergedMag, 1));
+mergedGeo.setAttribute('starColor', new THREE.BufferAttribute(mergedStarColor, 3));
+mergedGeo.setAttribute('conIndex', new THREE.BufferAttribute(mergedConIdx, 1));
+
+const NUM_CONS_GL = CONSTELLATIONS.length;
+
+const mergedHaloMat = new THREE.ShaderMaterial({
+  uniforms: { uTime: { value: 0 }, uDimValues: { value: conDimValues } },
+  vertexShader: `
+    attribute float size;
+    attribute float twinkleOff;
+    attribute float mag;
+    attribute vec3  starColor;
+    attribute float conIndex;
+    uniform   float uTime;
+    uniform   float uDimValues[${NUM_CONS_GL}];
+    varying   float vTwinkle;
+    varying   float vMag;
+    varying   vec3  vStarColor;
+    varying   float vDim;
+    void main() {
+      vStarColor = starColor;
+      vDim = uDimValues[int(conIndex)];
+      vMag = mag;
+      float freq   = 0.6 + fract(twinkleOff * 5.1) * 1.2;
+      float twinkAmp = 0.15 + 0.20 * smoothstep(0.0, 4.0, mag);
+      float fast = sin(uTime * freq + twinkleOff);
+      float slow = sin(uTime * 0.15 + twinkleOff * 2.3);
+      vTwinkle = (1.0 - twinkAmp) + twinkAmp * (fast * 0.7 + slow * 0.3);
+      float haloScale = 3.8 + smoothstep(2.0, 0.0, mag) * 1.2;
+      vec4 mv = modelViewMatrix * vec4(position, 1.0);
+      gl_PointSize = size * haloScale * vTwinkle * (300.0 / -mv.z);
+      gl_Position  = projectionMatrix * mv;
+    }
+  `,
+  fragmentShader: `
+    varying vec3  vStarColor;
+    varying float vDim;
+    varying float vTwinkle;
+    varying float vMag;
+    void main() {
+      float d = length(gl_PointCoord - 0.5);
+      if (d > 0.5) discard;
+      float a = exp(-d * d * 6.0) * 0.35 * vTwinkle * vDim;
+      float brightness = smoothstep(4.0, 0.0, vMag);
+      vec3 col = mix(vStarColor * 0.8, vStarColor, brightness);
+      gl_FragColor = vec4(col, a);
+    }
+  `,
+  transparent: true,
+  depthWrite: false,
+  blending: THREE.AdditiveBlending,
+});
+
+const mergedCoreMat = new THREE.ShaderMaterial({
+  uniforms: { uTime: { value: 0 }, uDimValues: { value: conDimValues } },
+  vertexShader: `
+    attribute float size;
+    attribute float twinkleOff;
+    attribute float mag;
+    attribute vec3  starColor;
+    attribute float conIndex;
+    uniform   float uTime;
+    uniform   float uDimValues[${NUM_CONS_GL}];
+    varying   float vTwinkle;
+    varying   float vMag;
+    varying   vec3  vStarColor;
+    varying   float vDim;
+    void main() {
+      vStarColor = starColor;
+      vDim = uDimValues[int(conIndex)];
+      vMag = mag;
+      float freq   = 0.6 + fract(twinkleOff * 5.1) * 1.2;
+      float twinkAmp = 0.15 + 0.20 * smoothstep(0.0, 4.0, mag);
+      float fast = sin(uTime * freq + twinkleOff);
+      float slow = sin(uTime * 0.15 + twinkleOff * 2.3);
+      vTwinkle = (1.0 - twinkAmp) + twinkAmp * (fast * 0.7 + slow * 0.3);
+      float coreScale = 1.0 + smoothstep(2.0, 0.0, mag) * 0.25;
+      vec4 mv = modelViewMatrix * vec4(position, 1.0);
+      gl_PointSize = size * coreScale * vTwinkle * (300.0 / -mv.z);
+      gl_Position  = projectionMatrix * mv;
+    }
+  `,
+  fragmentShader: `
+    varying vec3  vStarColor;
+    varying float vDim;
+    varying float vTwinkle;
+    varying float vMag;
+    void main() {
+      vec2  uv = gl_PointCoord - 0.5;
+      float d  = length(uv);
+      if (d > 0.5) discard;
+
+      float core = exp(-d * d * 30.0);
+      float halo = exp(-d * d * 7.0) * 0.5;
+      float a = (core + halo) * vTwinkle * vDim;
+
+      float tempShift = smoothstep(3.5, 0.0, vMag);
+      vec3  warmCore  = mix(vec3(1.0), vec3(1.0, 0.98, 0.95), 1.0 - tempShift);
+      vec3  col = mix(warmCore, vStarColor, smoothstep(0.0, 0.3, d));
+
+      gl_FragColor = vec4(col, a);
+    }
+  `,
+  transparent: true,
+  depthWrite: false,
+  blending: THREE.AdditiveBlending,
+});
+
+// mergedHaloMat disabled — new overlay StarShine handles star glow
+scene.add(new THREE.Points(mergedGeo, mergedCoreMat));
+animatedMaterials.push(mergedCoreMat);
 
 // ─── Art Of Code constellation overlay ───────────────────────────────────────
 // Fullscreen screen-space quad. Each frame we project the 3D star positions
@@ -1921,6 +1911,7 @@ CONSTELLATIONS.forEach(con => {
 // between connected stars, adapted from the Art Of Code tutorial shader.
 
 const CON_COUNT = CONSTELLATIONS.length; // 88
+const OVERLAY_SCALE = 1; // 0.7× resolution — ~2× fewer pixels, keeps lines sharp
 
 // Flat layout: all constellations' stars/lines concatenated.
 const starOffsets = [];
@@ -1972,7 +1963,7 @@ const conDimArr = new Array(CON_COUNT).fill(1.0);
 const overlayMat = new THREE.ShaderMaterial({
   uniforms: {
     uTime: { value: 0 },
-    uResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+    uResolution: { value: new THREE.Vector2(Math.floor(window.innerWidth * OVERLAY_SCALE), Math.floor(window.innerHeight * OVERLAY_SCALE)) },
     uStarPos: { value: starPosTex },   // data texture: NDC xy per star
     uLines: { value: linesTex },     // data texture: (starIdxA, starIdxB) per line
     // Per-constellation metadata — 40 elements each, well within uniform budget
@@ -2026,15 +2017,80 @@ const overlayMat = new THREE.ShaderMaterial({
       return core + glow;
     }
 
-    float Sparkle(vec2 p, vec2 center, float t) {
-      vec2  d2    = center - p;
-      float dist2 = dot(d2, d2);
-      if (dist2 > 0.0003) return 0.0; // hard cutoff — no long-range bleed
-      vec2  j     = d2 * 1400.0;
-      float base  = 1.0 / max(dot(j, j), 0.0001);
-      float seed  = fract(center.x * 412.3 + center.y * 253.7);
-      float pulse = sin(t * 8.0 + seed * 20.0) * 0.5 + 0.5;
-      return base * pulse * 0.6;
+    // ── Star-shine helpers (flare + happy_star) ──────────────────────────
+
+    float shineRandom(vec2 p) {
+      vec3 p3 = fract(vec3(p.xyx) * 0.1031);
+      p3 += dot(p3, p3.yzx + 33.33);
+      return fract((p3.x + p3.y) * p3.z);
+    }
+
+    float shineNoise(vec2 st) {
+      vec2 i = floor(st);
+      vec2 f = fract(st);
+      float a = shineRandom(i);
+      float b = shineRandom(i + vec2(1.0, 0.0));
+      float c = shineRandom(i + vec2(0.0, 1.0));
+      float d = shineRandom(i + vec2(1.0, 1.0));
+      vec2 u = f * f * (3.0 - 2.0 * f);
+      return mix(a, b, u.x) + (c - a) * u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
+    }
+
+    float shineFlare(float angle, float alpha, float t) {
+      float n = shineNoise(vec2(t + 0.5 + abs(angle) + pow(alpha, 0.6),
+                                t - abs(angle) + pow(alpha + 0.1, 0.6)) * 7.0);
+      float split = 15.0 + sin(t * 2.0 + n * 4.0 + angle * 20.0 + alpha * n)
+                    * (0.8 + alpha * 0.6 * n);
+      float rot = sin(angle * 20.0 + sin(angle * 15.0 + alpha * 4.0 + t * 30.0
+                  + n * 5.0 + alpha * 4.0) * (0.5 + alpha * 1.5));
+      float g = pow((2.0 + sin(split + n * 1.5 * alpha + rot) * 1.4) * n * 4.0,
+                    n * (1.5 - 0.8 * alpha));
+      g *= alpha * alpha * alpha * 0.5;
+      g += alpha * 0.7 + g * g * g;
+      return g;
+    }
+
+    float happyStar(vec2 uv, float anim) {
+      uv = abs(uv);
+      vec2 pos = min(uv.xy / max(uv.yx, vec2(0.0001)), anim);
+      float p = 2.0 - pos.x - pos.y;
+      return (2.0 + p * (p * p - 1.5)) / max(uv.x + uv.y, 0.0001);
+    }
+
+    #define SHINE_SPEED 0.105
+    #define SHINE_CORE  1.0
+    #define SHINE_RAYS  0.5
+    #define SHINE_SCALE 60.0
+
+    vec3 StarShine(vec2 p, vec2 center, float t, vec3 tint) {
+      vec2 d = p - center;
+      float dist2 = dot(d, d);
+      if (dist2 > 0.001) return vec3(0.0);
+
+      vec2 suv = d * SHINE_SCALE * 0.5;
+      float seed = fract(center.x * 127.1 + center.y * 311.7);
+      float st = (t + seed * 10.0) * SHINE_SPEED * 0.8;
+
+      float alpha = exp(-dot(suv, suv) / (SHINE_CORE * SHINE_CORE)) * 0.35;
+      float angle = atan(suv.x, suv.y);
+
+      float f  = shineFlare(angle, alpha, st) * 1.3;
+      float f2 = shineFlare(angle, alpha * 1.2, -st + alpha * 0.5 + 0.38134);
+
+      vec3 c = vec3(
+        f * (1.0 + sin(angle - st * 5.0) * 0.3) + f2 * f2 * f2,
+        f * alpha + f2 * f2 * 2.0,
+        f * alpha * 0.5 + f2 * (1.0 + sin(angle + st * 5.0) * 0.3)
+      );
+
+      vec2 ruv = suv * (2.0 * (cos((t + seed * 10.0) * 2.0) - 2.5)) / SHINE_RAYS;
+      float anim = sin((t + seed * 10.0) * 12.0) * 0.1 + 1.0;
+      vec3 rayTint = mix(vec3(0.55, 0.5, 1.15), tint * 0.6 + 0.4, 0.5);
+      vec3 star = happyStar(ruv, anim) * rayTint;
+      c *= star;
+      c += star * 0.01;
+
+      return max(c, vec3(0.0));
     }
 
     void main() {
@@ -2065,18 +2121,19 @@ const overlayMat = new THREE.ShaderMaterial({
           m += GlowLine(uv, sa, sb);
         }
 
+        vec3 shine = vec3(0.0);
         for (int si = 0; si < nS; si++) {
           vec2 raw = fetchStarPos(sOff + si);
           if (abs(raw.x) > 1.2 || abs(raw.y) > 1.2) continue; // off-screen
           vec2 sc = raw * 0.5;
           sc.x *= aspect;
-          m += Sparkle(uv, sc, uTime);
+          shine += StarShine(uv, sc, uTime, tint);
         }
 
-        col += tint * m * dim;
+        col += (tint * m + shine) * dim;
       }
 
-      col = clamp(col, 0.0, 1.2);
+      col = clamp(col, 0.0, 1.5);
       outColor = vec4(col, 1.0);
     }
   `,
@@ -2381,6 +2438,36 @@ renderer.setRenderTarget(meteorRtB);
 renderer.clear();
 renderer.setRenderTarget(null);
 
+// ─── Reduced-resolution overlay rendering ─────────────────────────────────────
+
+const overlayRt = new THREE.WebGLRenderTarget(
+  Math.floor(window.innerWidth * OVERLAY_SCALE), Math.floor(window.innerHeight * OVERLAY_SCALE),
+  { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat }
+);
+
+const overlayCompositeMat = new THREE.ShaderMaterial({
+  uniforms: { uOverlay: { value: overlayRt.texture } },
+  vertexShader: `
+    varying vec2 vUv;
+    void main() {
+      vUv = position.xy * 0.5 + 0.5;
+      gl_Position = vec4(position.xy, 0.0, 1.0);
+    }
+  `,
+  fragmentShader: `
+    varying vec2 vUv;
+    uniform sampler2D uOverlay;
+    void main() {
+      gl_FragColor = vec4(texture2D(uOverlay, vUv).rgb, 1.0);
+    }
+  `,
+  transparent: true,
+  blending: THREE.AdditiveBlending,
+  depthTest: false,
+  depthWrite: false,
+});
+const overlayCompositeMesh = new THREE.Mesh(fsQuadGeo, overlayCompositeMat);
+
 // ─── Resize ───────────────────────────────────────────────────────────────────
 
 window.addEventListener('resize', () => {
@@ -2389,7 +2476,8 @@ window.addEventListener('resize', () => {
   renderer.setSize(window.innerWidth, window.innerHeight);
   composer.setSize(window.innerWidth, window.innerHeight);
   bloomPass.setSize(Math.floor(window.innerWidth / 2), Math.floor(window.innerHeight / 2));
-  overlayMat.uniforms.uResolution.value.set(window.innerWidth, window.innerHeight);
+  overlayMat.uniforms.uResolution.value.set(Math.floor(window.innerWidth * OVERLAY_SCALE), Math.floor(window.innerHeight * OVERLAY_SCALE));
+  overlayRt.setSize(Math.floor(window.innerWidth * OVERLAY_SCALE), Math.floor(window.innerHeight * OVERLAY_SCALE));
   meteorRtA.setSize(window.innerWidth, window.innerHeight);
   meteorRtB.setSize(window.innerWidth, window.innerHeight);
   meteorFeedbackMat.uniforms.uResolution.value.set(window.innerWidth, window.innerHeight);
@@ -2537,8 +2625,10 @@ function dismissSplash() {
   splashEl.addEventListener('transitionend', () => splashEl.remove(), { once: true });
 }
 
-splashEl.addEventListener('click', dismissSplash, { once: true });
-document.addEventListener('keydown', dismissSplash, { once: true });
+if (splashEl) {
+  splashEl.addEventListener('click', dismissSplash, { once: true });
+  document.addEventListener('keydown', dismissSplash, { once: true });
+}
 
 // ─── Keybinds ─────────────────────────────────────────────────────────────────
 
@@ -2572,6 +2662,11 @@ window.addEventListener('keydown', e => {
 let lastTime = 0;
 const fpsEl = document.getElementById('fps');
 let fpsFrames = 0, fpsAccum = 0;
+
+// Pre-allocated temporaries (avoid per-frame allocation)
+const _projMat = new THREE.Matrix4();
+const _camDir = new THREE.Vector3();
+const _tmpV4 = new THREE.Vector4();
 
 function animateFixed() {
   requestAnimationFrame(animateFixed);
@@ -2627,13 +2722,12 @@ function animateFixed() {
   }
 
   animatedMaterials.forEach(m => { if (m.uniforms?.uTime) m.uniforms.uTime.value = t; });
-  conMatUniforms.forEach(u => { u.value = t; });
   overlayMat.uniforms.uTime.value = t;
 
   // ── Smooth dim transitions ─────────────────────────────────────────────────
   const DIM_SPEED_DOWN = 3.0; // dimming speed (units: 1/sec)
   const DIM_SPEED_UP = 0.6; // brightening speed — slower fade-in
-  constellationObjects.forEach(obj => {
+  constellationObjects.forEach((obj, ci) => {
     const diff = obj.dimTarget - obj.uDim.value;
     if (Math.abs(diff) > 0.0001) {
       const speed = diff > 0 ? DIM_SPEED_UP : DIM_SPEED_DOWN;
@@ -2641,26 +2735,26 @@ function animateFixed() {
     } else {
       obj.uDim.value = obj.dimTarget;
     }
+    conDimValues[ci] = obj.uDim.value;
   });
 
   // ── Project constellation star positions to screen space ───────────────────
   {
-    const projMat = new THREE.Matrix4().multiplyMatrices(
-      camera.projectionMatrix, camera.matrixWorldInverse
-    );
-    const tmpV = new THREE.Vector4();
+    _projMat.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
+    _camDir.copy(camera.position).normalize();
     let si = 0;
     constellationObjects.forEach((obj, ci) => {
-      // Update per-constellation dim for overlay (mutate in-place)
-      overlayMat.uniforms.uConDim.value[ci] = obj.uDim.value;
+      // Back-face cull: skip overlay for constellations behind camera
+      const dot = obj.centroidDir.x * _camDir.x + obj.centroidDir.y * _camDir.y + obj.centroidDir.z * _camDir.z;
+      overlayMat.uniforms.uConDim.value[ci] = dot > 0.3 ? 0.0 : obj.uDim.value;
       obj.worldPositions.forEach(wp => {
-        tmpV.set(wp.x, wp.y, wp.z, 1.0).applyMatrix4(projMat);
-        const w = tmpV.w;
+        _tmpV4.set(wp.x, wp.y, wp.z, 1.0).applyMatrix4(_projMat);
+        const w = _tmpV4.w;
         const px = si * 4;
         if (w <= 0) {
           starPosData[px] = -10; starPosData[px + 1] = -10;
         } else {
-          starPosData[px] = tmpV.x / w; starPosData[px + 1] = tmpV.y / w;
+          starPosData[px] = _tmpV4.x / w; starPosData[px + 1] = _tmpV4.y / w;
         }
         si++;
       });
@@ -2668,11 +2762,10 @@ function animateFixed() {
     starPosTex.needsUpdate = true;
   }
 
-  const camDirFromOrigin = camera.position.clone().normalize();
   constellationLabels.forEach(label => {
     const normal = label.userData.normal;
     if (!normal) return;
-    const facing = normal.dot(camDirFromOrigin);
+    const facing = normal.dot(_camDir);
     const fade = THREE.MathUtils.smoothstep(facing, -0.25, 0.35);
     const maxOpacity = (label.userData.demoActive === false) ? 0.05 : 0.88;
     label.material.opacity = Math.min(maxOpacity, 0.18 + fade * 0.7);
@@ -2683,7 +2776,7 @@ function animateFixed() {
     let bestIndex = -1;
     let bestDot = 0.6; // threshold — must be this centered to show panel
     constellationObjects.forEach((obj, i) => {
-      const d = obj.centroid.clone().normalize().dot(camDirFromOrigin.clone().negate());
+      const d = -obj.centroidDir.dot(_camDir);
       if (d > bestDot) { bestDot = d; bestIndex = i; }
     });
     if (bestIndex !== -1) {
@@ -2758,13 +2851,19 @@ function animateFixed() {
   if (!demoActive || demoCamT >= 1.0) controls.update();
   composer.render();
 
-  // 3. Render constellation overlay (screen-space lines + sparkles) — AFTER bloom
-  //    so bloom never sees it and can't create a large soft oval artifact
-  renderer.autoClear = false;
+  // 3. Render constellation overlay at half resolution into RT
+  renderer.setRenderTarget(overlayRt);
+  renderer.autoClear = true;
   orthoScene.add(overlayMesh);
   renderer.render(orthoScene, orthoCamera);
   orthoScene.remove(overlayMesh);
-  renderer.autoClear = true;
+
+  // 3b. Composite overlay RT onto screen (additive)
+  renderer.setRenderTarget(null);
+  renderer.autoClear = false;
+  orthoScene.add(overlayCompositeMesh);
+  renderer.render(orthoScene, orthoCamera);
+  orthoScene.remove(overlayCompositeMesh);
 
   // 4. Composite feedback trail additively over the finished frame
   //    Must NOT auto-clear here or we erase the bloom output
