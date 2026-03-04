@@ -159,10 +159,148 @@
       z-index: 2;
       text-shadow: 0 0 10px rgba(120, 180, 255, 0.6);
     }
+
+    #demo-timing {
+      display: none;
+      position: fixed;
+      top: 66px;
+      right: 28px;
+      color: rgba(160, 200, 255, 0.55);
+      font-family: 'Monda', monospace;
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      pointer-events: none;
+      user-select: none;
+      z-index: 2;
+      line-height: 1.7;
+    }
+
+    /* ── Splash screen ───────────────────────────────────────────────────── */
+    #splash {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(ellipse at center,
+        rgba(4, 6, 20, 0.88) 0%,
+        rgba(0, 0, 10, 0.96) 100%);
+      transition: opacity 0.9s ease;
+    }
+    #splash.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    #splash-inner {
+      text-align: center;
+      user-select: none;
+    }
+
+    #splash-title {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.5em;
+      text-transform: uppercase;
+      color: rgba(190, 215, 255, 0.55);
+      margin-bottom: 36px;
+      text-shadow: 0 0 22px rgba(120, 160, 255, 0.4);
+    }
+
+    #splash-heading {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: rgba(160, 190, 255, 0.4);
+      margin-bottom: 24px;
+    }
+
+    .splash-keys {
+      display: inline-flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-bottom: 44px;
+    }
+
+    .key-row {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .key-row .key {
+      display: inline-block;
+      min-width: 72px;
+      text-align: right;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: rgba(200, 220, 255, 0.9);
+      text-shadow: 0 0 12px rgba(130, 170, 255, 0.7);
+    }
+
+    .key-row .key-sep {
+      width: 1px;
+      height: 14px;
+      background: rgba(120, 160, 255, 0.2);
+      flex-shrink: 0;
+    }
+
+    .key-row .key-desc {
+      min-width: 210px;
+      text-align: left;
+      font-size: 12px;
+      letter-spacing: 0.16em;
+      color: rgba(160, 185, 230, 0.55);
+    }
+
+    #splash-prompt {
+      font-size: 10px;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: rgba(140, 170, 220, 0.35);
+      animation: pulse 2.2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.35; }
+      50%       { opacity: 0.75; }
+    }
   </style>
 </head>
 
 <body>
+  <div id="splash">
+    <div id="splash-inner">
+      <div id="splash-title">The Celestial Firmament</div>
+      <div id="splash-heading">Controls</div>
+      <div class="splash-keys">
+        <div class="key-row">
+          <span class="key">D</span>
+          <span class="key-sep"></span>
+          <span class="key-desc">Toggle demo mode</span>
+        </div>
+        <div class="key-row">
+          <span class="key">← →</span>
+          <span class="key-sep"></span>
+          <span class="key-desc">Prev / next constellation</span>
+        </div>
+        <div class="key-row">
+          <span class="key">[ ]</span>
+          <span class="key-sep"></span>
+          <span class="key-desc">Hold time &minus;5s / +5s</span>
+        </div>
+        <div class="key-row">
+          <span class="key">, .</span>
+          <span class="key-sep"></span>
+          <span class="key-desc">Transition &minus;1s / +1s</span>
+        </div>
+      </div>
+      <div id="splash-prompt">Click or press any key</div>
+    </div>
+  </div>
   <div id="canvas-container"></div>
   <div id="vignette"></div>
   <div id="grain"></div>
@@ -174,6 +312,7 @@
   </div>
   <div id="fps">-- FPS</div>
   <div id="demo-badge">Demo</div>
+  <div id="demo-timing"></div>
 
   <script type="importmap">
     {

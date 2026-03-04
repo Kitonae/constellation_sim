@@ -2432,13 +2432,14 @@ function hideConstellationInfo(onHidden) {
 let demoActive = false;
 let demoIndex = 0;
 let demoTimer = 0;
-const DEMO_HOLD = 60.0;  // seconds per constellation
-const DEMO_TRANS = 12.0;   // seconds for camera transition
+let DEMO_HOLD = 60.0;  // seconds per constellation
+let DEMO_TRANS = 12.0;   // seconds for camera transition
 let demoCamFrom = new THREE.Vector3();
 let demoCamTo = new THREE.Vector3();
 let demoCamT = 1.0;   // 1 = transition complete
 let demoCamWasMoving = false; // used to detect the moment the transition finishes
 const demoBadge = document.getElementById('demo-badge');
+const demoTimingEl = document.getElementById('demo-timing');
 const CAMERA_DIST = 1.0;   // camera sits at distance 1 from origin
 
 function demoTargetPos(index) {
@@ -2483,12 +2484,30 @@ function restoreDemoVisuals() {
   });
 }
 
+function updateDemoTimingHUD() {
+  demoTimingEl.innerHTML =
+    `hold: ${DEMO_HOLD.toFixed(0)}s &nbsp;[/]<br>trans: ${DEMO_TRANS.toFixed(1)}s &nbsp;,/.`;
+}
+
+function demoJumpTo(newIndex) {
+  // Jump to a specific constellation index, resetting the hold timer.
+  demoIndex = (newIndex + constellationObjects.length) % constellationObjects.length;
+  demoTimer = 0;
+  demoCamFrom.copy(camera.position);
+  demoCamTo.copy(demoTargetPos(demoIndex));
+  demoCamT = 0;
+  demoCamWasMoving = false;
+  startDemoFly(demoIndex);
+}
+
 function startDemo() {
   demoActive = true;
   demoIndex = 0;
   demoTimer = 0;
   demoCamWasMoving = false;
   demoBadge.style.display = 'block';
+  demoTimingEl.style.display = 'block';
+  updateDemoTimingHUD();
   controls.autoRotate = false;
   // Begin camera fly to first constellation
   demoCamFrom.copy(camera.position);
@@ -2500,6 +2519,7 @@ function startDemo() {
 function stopDemo() {
   demoActive = false;
   demoBadge.style.display = 'none';
+  demoTimingEl.style.display = 'none';
   controls.autoRotate = true;
   restoreDemoVisuals();
   // Hide info panel when leaving demo mode
@@ -2508,9 +2528,43 @@ function stopDemo() {
   }
 }
 
+// ─── Splash screen ────────────────────────────────────────────────────────────
+
+const splashEl = document.getElementById('splash');
+
+function dismissSplash() {
+  splashEl.classList.add('hidden');
+  splashEl.addEventListener('transitionend', () => splashEl.remove(), { once: true });
+}
+
+splashEl.addEventListener('click', dismissSplash, { once: true });
+document.addEventListener('keydown', dismissSplash, { once: true });
+
+// ─── Keybinds ─────────────────────────────────────────────────────────────────
+
 window.addEventListener('keydown', e => {
   if (e.key === 'd' || e.key === 'D') {
     demoActive ? stopDemo() : startDemo();
+    return;
+  }
+  if (demoActive && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')) {
+    e.preventDefault();
+    demoJumpTo(demoIndex + (e.key === 'ArrowRight' ? 1 : -1));
+    return;
+  }
+  // Adjust demo timings (only meaningful during demo, but allowed anytime)
+  if (e.key === ']') {
+    DEMO_HOLD = Math.min(300, DEMO_HOLD + 5);
+    if (demoActive) updateDemoTimingHUD();
+  } else if (e.key === '[') {
+    DEMO_HOLD = Math.max(5, DEMO_HOLD - 5);
+    if (demoActive) updateDemoTimingHUD();
+  } else if (e.key === '.') {
+    DEMO_TRANS = Math.min(60, parseFloat((DEMO_TRANS + 1).toFixed(1)));
+    if (demoActive) updateDemoTimingHUD();
+  } else if (e.key === ',') {
+    DEMO_TRANS = Math.max(1, parseFloat((DEMO_TRANS - 1).toFixed(1)));
+    if (demoActive) updateDemoTimingHUD();
   }
 });
 
