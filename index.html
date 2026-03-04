@@ -175,6 +175,204 @@
       line-height: 1.7;
     }
 
+    /* ── Settings button ─────────────────────────────────────────────────── */
+    #settings-btn {
+      position: fixed;
+      top: 24px;
+      left: 28px;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 10;
+      color: rgba(160, 185, 230, 0.55);
+      font-size: 16px;
+      line-height: 1;
+      user-select: none;
+      transition: color 0.2s ease;
+    }
+    #settings-btn:hover {
+      color: rgba(190, 215, 255, 0.85);
+    }
+
+    #settings-panel {
+      position: fixed;
+      top: 58px;
+      left: 28px;
+      z-index: 10;
+      background: rgba(4, 6, 22, 0.92);
+      border: 1px solid rgba(100, 140, 220, 0.18);
+      border-radius: 6px;
+      padding: 14px 16px 14px;
+      width: 260px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+    #settings-panel.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* ── section heading ── */
+    .sp-heading {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.38em;
+      text-transform: uppercase;
+      color: rgba(140, 170, 220, 0.45);
+      margin-bottom: 8px;
+    }
+
+    /* ── preset quick-buttons ── */
+    .sp-presets {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+    .sp-preset {
+      flex: 1;
+      padding: 5px 0;
+      border: 1px solid rgba(100, 140, 220, 0.2);
+      border-radius: 4px;
+      background: transparent;
+      color: rgba(160, 190, 235, 0.55);
+      font-family: 'Monda', monospace;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+      text-align: center;
+      user-select: none;
+    }
+    .sp-preset:hover {
+      background: rgba(100, 140, 255, 0.1);
+      color: rgba(200, 220, 255, 0.85);
+      border-color: rgba(120, 160, 255, 0.4);
+    }
+    .sp-preset.active {
+      background: rgba(100, 140, 255, 0.18);
+      color: rgba(200, 220, 255, 1.0);
+      border-color: rgba(130, 170, 255, 0.6);
+    }
+
+    /* ── divider between sections ── */
+    .sp-divider {
+      height: 1px;
+      background: rgba(100, 140, 220, 0.1);
+      margin: 10px 0;
+    }
+
+    /* ── individual control row ── */
+    .sp-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 9px;
+    }
+    .sp-row:last-child { margin-bottom: 0; }
+
+    .sp-label {
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      color: rgba(160, 185, 230, 0.6);
+      width: 86px;
+      flex-shrink: 0;
+    }
+
+    /* slider */
+    .sp-slider {
+      flex: 1;
+      -webkit-appearance: none;
+      appearance: none;
+      height: 2px;
+      border-radius: 2px;
+      background: rgba(100, 140, 220, 0.22);
+      outline: none;
+      cursor: pointer;
+    }
+    .sp-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: rgba(140, 185, 255, 0.8);
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .sp-slider::-webkit-slider-thumb:hover {
+      background: rgba(180, 215, 255, 1.0);
+    }
+    .sp-slider::-moz-range-thumb {
+      width: 10px;
+      height: 10px;
+      border: none;
+      border-radius: 50%;
+      background: rgba(140, 185, 255, 0.8);
+      cursor: pointer;
+    }
+
+    /* value readout */
+    .sp-val {
+      font-size: 10px;
+      font-family: 'Monda', monospace;
+      letter-spacing: 0.08em;
+      color: rgba(180, 205, 250, 0.7);
+      width: 30px;
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    /* toggle */
+    .sp-toggle {
+      flex: 1;
+      display: flex;
+      align-items: center;
+    }
+    .sp-toggle-track {
+      width: 30px;
+      height: 14px;
+      border-radius: 7px;
+      background: rgba(80, 110, 180, 0.25);
+      border: 1px solid rgba(100, 140, 220, 0.22);
+      position: relative;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+      flex-shrink: 0;
+    }
+    .sp-toggle-track.on {
+      background: rgba(80, 130, 255, 0.45);
+      border-color: rgba(120, 170, 255, 0.5);
+    }
+    .sp-toggle-thumb {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(140, 170, 220, 0.6);
+      transition: left 0.15s, background 0.15s;
+    }
+    .sp-toggle-track.on .sp-toggle-thumb {
+      left: 18px;
+      background: rgba(180, 215, 255, 0.95);
+    }
+    .sp-toggle-label {
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      color: rgba(140, 170, 220, 0.4);
+      margin-left: 8px;
+      transition: color 0.15s;
+    }
+    .sp-toggle-track.on + .sp-toggle-label {
+      color: rgba(170, 205, 255, 0.75);
+    }
+
     /* ── Splash screen ───────────────────────────────────────────────────── */
     #splash {
       position: fixed;
@@ -283,6 +481,11 @@
           <span class="key-desc">Toggle demo mode</span>
         </div>
         <div class="key-row">
+          <span class="key">Q</span>
+          <span class="key-sep"></span>
+          <span class="key-desc">Quality settings</span>
+        </div>
+        <div class="key-row">
           <span class="key">← →</span>
           <span class="key-sep"></span>
           <span class="key-desc">Prev / next constellation</span>
@@ -305,6 +508,66 @@
   <div id="vignette"></div>
   <div id="grain"></div>
   <div id="title">The Celestial Firmament</div>
+  <div id="settings-btn" title="Quality settings (Q)">&#9881;</div>
+  <div id="settings-panel">
+    <div class="sp-heading">Presets</div>
+    <div class="sp-presets">
+      <div class="sp-preset" data-preset="Low">Low</div>
+      <div class="sp-preset" data-preset="Medium">Med</div>
+      <div class="sp-preset" data-preset="High">High</div>
+    </div>
+
+    <div class="sp-divider"></div>
+    <div class="sp-heading">Rendering</div>
+
+    <div class="sp-row">
+      <span class="sp-label">Resolution</span>
+      <input class="sp-slider" id="sq-pixelratio" type="range" min="1" max="4" step="1">
+      <span class="sp-val" id="sq-pixelratio-val"></span>
+    </div>
+    <div class="sp-row">
+      <span class="sp-label">Bloom</span>
+      <div class="sp-toggle">
+        <div class="sp-toggle-track" id="sq-bloom-track">
+          <div class="sp-toggle-thumb"></div>
+        </div>
+        <span class="sp-toggle-label" id="sq-bloom-label"></span>
+      </div>
+    </div>
+    <div class="sp-row">
+      <span class="sp-label">Overlay res.</span>
+      <input class="sp-slider" id="sq-overlay" type="range" min="1" max="4" step="1">
+      <span class="sp-val" id="sq-overlay-val"></span>
+    </div>
+
+    <div class="sp-divider"></div>
+    <div class="sp-heading">Particles</div>
+
+    <div class="sp-row">
+      <span class="sp-label">Stars</span>
+      <input class="sp-slider" id="sq-stars" type="range" min="1" max="5" step="1">
+      <span class="sp-val" id="sq-stars-val"></span>
+    </div>
+    <div class="sp-row">
+      <span class="sp-label">Milky Way</span>
+      <input class="sp-slider" id="sq-milkyway" type="range" min="1" max="5" step="1">
+      <span class="sp-val" id="sq-milkyway-val"></span>
+    </div>
+
+    <div class="sp-divider"></div>
+    <div class="sp-heading">Effects</div>
+
+    <div class="sp-row">
+      <span class="sp-label">Nebula detail</span>
+      <input class="sp-slider" id="sq-nebula" type="range" min="1" max="5" step="1">
+      <span class="sp-val" id="sq-nebula-val"></span>
+    </div>
+    <div class="sp-row">
+      <span class="sp-label">Meteors</span>
+      <input class="sp-slider" id="sq-meteors" type="range" min="0" max="3" step="1">
+      <span class="sp-val" id="sq-meteors-val"></span>
+    </div>
+  </div>
   <div id="constellation-info">
     <div class="con-name" id="con-name"></div>
     <div class="con-translation" id="con-translation"></div>

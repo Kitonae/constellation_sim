@@ -8,6 +8,7 @@ import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js'
 
 const container = document.getElementById('canvas-container');
 const renderer = new THREE.WebGLRenderer({ antialias: true });
+// Pixel ratio is set below after QUALITY_PRESETS is defined; use a safe default for now.
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1));
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setClearColor(0x00000a);
@@ -39,6 +40,75 @@ const bloomPass = new UnrealBloomPass(
 );
 bloomPass.enabled = true;
 composer.addPass(bloomPass);
+
+// ─── Quality settings ─────────────────────────────────────────────────────────
+// Each setting is stored independently in localStorage.
+// Sliders use integer steps mapped to concrete values via lookup tables.
+
+const QS_PIXEL_RATIO_STEPS = [0.5, 0.75, 1.0, Math.min(window.devicePixelRatio, 2.0)];
+const QS_OVERLAY_STEPS     = [0.5, 0.7, 0.85, 1.0];
+const QS_STAR_STEPS        = [1000, 2000, 3500, 5000, 7000];
+const QS_MILKYWAY_STEPS    = [3000, 6000, 10000, 14000, 18000];
+// nebula: [iter1, iter2] per step
+const QS_NEBULA_STEPS      = [[4,8],[6,9],[8,12],[10,15],[13,18]];
+
+// Pixel ratio step labels shown in the value readout
+const QS_PIXEL_RATIO_LABELS = ['0.5×','0.75×','1×', window.devicePixelRatio > 1 ? `${Math.min(window.devicePixelRatio,2).toFixed(1)}×` : 'Native'];
+
+// Default settings (High quality)
+const QS_DEFAULTS = {
+  pixelRatioStep: 3,   // index into QS_PIXEL_RATIO_STEPS
+  bloom: true,
+  overlayStep: 4,      // 1-based to match slider min=1
+  starsStep: 5,
+  milkyWayStep: 5,
+  nebulaStep: 5,
+  meteors: 3,
+};
+
+// Preset stamps — set of step values for Low / Medium / High
+const QUALITY_PRESETS = {
+  Low:    { pixelRatioStep:1, bloom:false, overlayStep:1, starsStep:1, milkyWayStep:1, nebulaStep:1, meteors:0 },
+  Medium: { pixelRatioStep:2, bloom:true,  overlayStep:2, starsStep:3, milkyWayStep:3, nebulaStep:3, meteors:1 },
+  High:   { pixelRatioStep:3, bloom:true,  overlayStep:4, starsStep:5, milkyWayStep:5, nebulaStep:5, meteors:3 },
+};
+
+function qsLoad() {
+  const s = {};
+  for (const [k, def] of Object.entries(QS_DEFAULTS)) {
+    const raw = localStorage.getItem(`cfs_qs_${k}`);
+    if (raw === null) { s[k] = def; continue; }
+    s[k] = (typeof def === 'boolean') ? (raw === 'true') : Number(raw);
+  }
+  return s;
+}
+
+function qsSave(qs) {
+  for (const [k, v] of Object.entries(qs)) {
+    localStorage.setItem(`cfs_qs_${k}`, String(v));
+  }
+}
+
+let QS = qsLoad();
+
+// Derived concrete values from current QS state
+function qsPixelRatio()   { return QS_PIXEL_RATIO_STEPS[QS.pixelRatioStep - 1]; }
+function qsOverlayScale() { return QS_OVERLAY_STEPS[QS.overlayStep - 1]; }
+function qsStarCount()    { return QS_STAR_STEPS[QS.starsStep - 1]; }
+function qsMilkyWayCount(){ return QS_MILKYWAY_STEPS[QS.milkyWayStep - 1]; }
+function qsNebulaIters()  { return QS_NEBULA_STEPS[QS.nebulaStep - 1]; }
+
+// deriveQualityLabel() returns Low/Medium/High/Custom from current QS state
+function deriveQualityLabel() {
+  for (const [name, preset] of Object.entries(QUALITY_PRESETS)) {
+    if (Object.entries(preset).every(([k,v]) => QS[k] === v)) return name;
+  }
+  return 'Custom';
+}
+
+// Apply initial pixel ratio + bloom from loaded QS
+renderer.setPixelRatio(qsPixelRatio());
+bloomPass.enabled = QS.bloom;
 
 // ─── Constellation data ───────────────────────────────────────────────────────
 // [ra_deg, dec_deg, magnitude]
@@ -1541,12 +1611,12 @@ function createStarField(count = 7000) {
   return new THREE.Points(geo, mat);
 }
 
-scene.add(createStarField());
+let starFieldPoints = createStarField(qsStarCount());
+scene.add(starFieldPoints);
 
 // ─── Milky Way ────────────────────────────────────────────────────────────────
 
-(function addMilkyWay() {
-  const count = 18000;
+function createMilkyWay(count) {
   const positions = new Float32Array(count * 3);
   const alphas = new Float32Array(count);
   const colors = new Float32Array(count * 3);
@@ -1614,14 +1684,19 @@ scene.add(createStarField());
     blending: THREE.AdditiveBlending,
   });
 
-  scene.add(new THREE.Points(geo, mat));
-})();
+  return new THREE.Points(geo, mat);
+}
+
+let milkyWayPoints = createMilkyWay(qsMilkyWayCount());
+scene.add(milkyWayPoints);
 
 // (foreground dust removed — caused bloom oval artifact at screen center)
 
 // ─── Nebulae (kaliset fractal, localized billboards) ──────────────────────────
 // Based on "Simplicity Galaxy" by CBS (https://www.shadertoy.com/view/MslGWN)
 // and Jared Berghold's variant. Static, blurred, translucent clouds.
+
+const nebulaMaterials = []; // collected so applyQS() can update uIter1/uIter2
 
 const nebulaVertexShader = `
   varying vec2 vUv;
@@ -1637,6 +1712,8 @@ const nebulaFragmentShader = `
   uniform vec3  uColor2;
   uniform vec2  uOffset;
   uniform float uScale;
+  uniform int   uIter1;
+  uniform int   uIter2;
   varying vec2  vUv;
 
   const int MAX_ITER = 18;
@@ -1665,8 +1742,8 @@ const nebulaFragmentShader = `
 
     vec3 p  = vec3(vUv * uScale + uOffset, 0.0);
     vec3 p2 = p + vec3(0.4, 0.2, 1.5);
-    float t  = field(p,  0.15, 13);
-    float t2 = field(p2, 0.90, 18);
+    float t  = field(p,  0.15, uIter1);
+    float t2 = field(p2, 0.90, uIter2);
 
     vec3 col  = uColor  * (1.5 * 0.15 * t*t*t + 1.2 * 0.4 * t*t + 0.9 * t);
     vec3 col2 = uColor2 * (5.5 * t2*t2*t2 + 2.1 * t2*t2 + 2.2 * t2 * 0.45);
@@ -1678,12 +1755,15 @@ const nebulaFragmentShader = `
 
 function addNebula(ra, dec, color1, color2, worldSize, offset, scale) {
   const pos = raDecToVec3(ra, dec, 97);
+  const [iter1, iter2] = qsNebulaIters();
   const mat = new THREE.ShaderMaterial({
     uniforms: {
       uColor: { value: new THREE.Color(color1) },
       uColor2: { value: new THREE.Color(color2) },
       uOffset: { value: new THREE.Vector2(offset[0], offset[1]) },
       uScale: { value: scale },
+      uIter1: { value: iter1 },
+      uIter2: { value: iter2 },
     },
     vertexShader: nebulaVertexShader,
     fragmentShader: nebulaFragmentShader,
@@ -1692,6 +1772,7 @@ function addNebula(ra, dec, color1, color2, worldSize, offset, scale) {
     blending: THREE.AdditiveBlending,
     side: THREE.DoubleSide,
   });
+  nebulaMaterials.push(mat);
   const sprite = new THREE.Mesh(new THREE.PlaneGeometry(worldSize, worldSize), mat);
   sprite.position.copy(pos);
   sprite.lookAt(0, 0, 0);
@@ -1911,7 +1992,7 @@ animatedMaterials.push(mergedCoreMat);
 // between connected stars, adapted from the Art Of Code tutorial shader.
 
 const CON_COUNT = CONSTELLATIONS.length; // 88
-const OVERLAY_SCALE = 1; // 0.7× resolution — ~2× fewer pixels, keeps lines sharp
+let OVERLAY_SCALE = qsOverlayScale();
 
 // Flat layout: all constellations' stars/lines concatenated.
 const starOffsets = [];
@@ -2155,7 +2236,8 @@ overlayMesh.frustumCulled = false;
 
 // ─── Shooting stars (meteors) ─────────────────────────────────────────────────
 
-const MAX_METEORS = 3;
+const MAX_METEORS = 3;           // total meteor slots (fixed — shader uses #define MAX_M 3)
+let activeMaxMeteors = QS.meteors;
 const meteors = [];
 const meteorGroup = new THREE.Group();
 scene.add(meteorGroup);
@@ -2264,7 +2346,8 @@ function spawnMeteor() {
 
 for (let i = 0; i < MAX_METEORS; i++) {
   const m = spawnMeteor();
-  m.spawnDelay = i * 4 + Math.random() * 4; // stagger initial appearances: ~0s, ~4s, ~8s
+  // Slots beyond activeMaxMeteors start with infinite delay (disabled)
+  m.spawnDelay = i < activeMaxMeteors ? (i * 4 + Math.random() * 4) : Infinity;
   meteors.push(m);
   // spawnDelay > 0 for all, so none are added to scene yet — updateMeteors handles it
 }
@@ -2287,7 +2370,8 @@ function updateMeteors(dt) {
       m.headGeo.dispose();
       m.headPts.material.dispose();
       const nm = spawnMeteor();
-      nm.spawnDelay = 5 + Math.random() * 10; // wait 5–15 s before appearing
+      // If this slot is disabled by current quality, park it with infinite delay
+      nm.spawnDelay = idx < activeMaxMeteors ? (5 + Math.random() * 10) : Infinity;
       meteors[idx] = nm;
       return;
     }
@@ -2468,11 +2552,81 @@ const overlayCompositeMat = new THREE.ShaderMaterial({
 });
 const overlayCompositeMesh = new THREE.Mesh(fsQuadGeo, overlayCompositeMat);
 
+// ─── Quality control ──────────────────────────────────────────────────────────
+
+// Apply all settings from the current QS state to the renderer and scene.
+// Pass a partial object to override only specific keys before applying.
+function applyQS(overrides) {
+  if (overrides) Object.assign(QS, overrides);
+  qsSave(QS);
+
+  // 1. Pixel ratio
+  renderer.setPixelRatio(qsPixelRatio());
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  composer.setSize(window.innerWidth, window.innerHeight);
+
+  // 2. Bloom
+  bloomPass.enabled = QS.bloom;
+  bloomPass.setSize(Math.floor(window.innerWidth / 2), Math.floor(window.innerHeight / 2));
+
+  // 3. Overlay resolution
+  OVERLAY_SCALE = qsOverlayScale();
+  overlayMat.uniforms.uResolution.value.set(
+    Math.floor(window.innerWidth * OVERLAY_SCALE),
+    Math.floor(window.innerHeight * OVERLAY_SCALE),
+  );
+  overlayRt.setSize(
+    Math.floor(window.innerWidth * OVERLAY_SCALE),
+    Math.floor(window.innerHeight * OVERLAY_SCALE),
+  );
+
+  // 4. Background star field — rebuild geometry
+  scene.remove(starFieldPoints);
+  const sfIdx = animatedMaterials.indexOf(starFieldPoints.material);
+  if (sfIdx !== -1) animatedMaterials.splice(sfIdx, 1);
+  starFieldPoints.geometry.dispose();
+  starFieldPoints.material.dispose();
+  starFieldPoints = createStarField(qsStarCount());
+  scene.add(starFieldPoints);
+
+  // 5. Milky Way — rebuild geometry
+  scene.remove(milkyWayPoints);
+  milkyWayPoints.geometry.dispose();
+  milkyWayPoints.material.dispose();
+  milkyWayPoints = createMilkyWay(qsMilkyWayCount());
+  scene.add(milkyWayPoints);
+
+  // 6. Nebula fractal iterations
+  const [iter1, iter2] = qsNebulaIters();
+  nebulaMaterials.forEach(m => {
+    m.uniforms.uIter1.value = iter1;
+    m.uniforms.uIter2.value = iter2;
+  });
+
+  // 7. Meteor count
+  activeMaxMeteors = QS.meteors;
+  meteors.forEach((m, idx) => {
+    if (idx >= activeMaxMeteors) {
+      meteorGroup.remove(m.headPts);
+      m.headGeo.attributes.position.array[0] = -10000;
+      m.headGeo.attributes.position.needsUpdate = true;
+      m.headOpUniform.value = 0;
+      m.spawnDelay = Infinity;
+      m.t = m.life + 1;
+    } else if (!isFinite(m.spawnDelay)) {
+      m.spawnDelay = 2 + idx * 3 + Math.random() * 4;
+    }
+  });
+
+  updateSettingsPanel();
+}
+
 // ─── Resize ───────────────────────────────────────────────────────────────────
 
 window.addEventListener('resize', () => {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
+  renderer.setPixelRatio(qsPixelRatio());
   renderer.setSize(window.innerWidth, window.innerHeight);
   composer.setSize(window.innerWidth, window.innerHeight);
   bloomPass.setSize(Math.floor(window.innerWidth / 2), Math.floor(window.innerHeight / 2));
@@ -2630,9 +2784,131 @@ if (splashEl) {
   document.addEventListener('keydown', dismissSplash, { once: true });
 }
 
+// ─── Settings panel ───────────────────────────────────────────────────────────
+
+const settingsBtn = document.getElementById('settings-btn');
+const settingsPanel = document.getElementById('settings-panel');
+let settingsPanelOpen = false;
+
+function updateSettingsPanel() {
+  if (!settingsPanel) return;
+
+  // Sliders
+  const sliders = {
+    'sq-pixelratio': QS.pixelRatioStep,
+    'sq-overlay':    QS.overlayStep,
+    'sq-stars':      QS.starsStep,
+    'sq-milkyway':   QS.milkyWayStep,
+    'sq-nebula':     QS.nebulaStep,
+    'sq-meteors':    QS.meteors,
+  };
+  for (const [id, val] of Object.entries(sliders)) {
+    const el = document.getElementById(id);
+    if (el) el.value = val;
+  }
+
+  // Value readouts
+  const pixelRatioVal = document.getElementById('sq-pixelratio-val');
+  if (pixelRatioVal) pixelRatioVal.textContent = QS_PIXEL_RATIO_LABELS[QS.pixelRatioStep - 1];
+
+  const overlayVal = document.getElementById('sq-overlay-val');
+  if (overlayVal) overlayVal.textContent = `${Math.round(QS_OVERLAY_STEPS[QS.overlayStep - 1] * 100)}%`;
+
+  const starsVal = document.getElementById('sq-stars-val');
+  if (starsVal) starsVal.textContent = QS_STAR_STEPS[QS.starsStep - 1].toLocaleString();
+
+  const milkywayVal = document.getElementById('sq-milkyway-val');
+  if (milkywayVal) milkywayVal.textContent = QS_MILKYWAY_STEPS[QS.milkyWayStep - 1].toLocaleString();
+
+  const nebulaSteps = ['Low','Low+','Mid','High-','High'];
+  const nebulaVal = document.getElementById('sq-nebula-val');
+  if (nebulaVal) nebulaVal.textContent = nebulaSteps[QS.nebulaStep - 1];
+
+  const meteorsVal = document.getElementById('sq-meteors-val');
+  if (meteorsVal) meteorsVal.textContent = QS.meteors === 0 ? 'Off' : String(QS.meteors);
+
+  // Bloom toggle
+  const bloomTrack = document.getElementById('sq-bloom-track');
+  if (bloomTrack) bloomTrack.classList.toggle('on', QS.bloom);
+  const bloomLabel = document.getElementById('sq-bloom-label');
+  if (bloomLabel) bloomLabel.textContent = QS.bloom ? 'On' : 'Off';
+
+  // Preset buttons — highlight active preset if current QS matches one
+  const activePreset = deriveQualityLabel();
+  settingsPanel.querySelectorAll('.sp-preset').forEach(el => {
+    el.classList.toggle('active', el.dataset.preset === activePreset);
+  });
+}
+
+function toggleSettingsPanel() {
+  settingsPanelOpen = !settingsPanelOpen;
+  settingsPanel.classList.toggle('visible', settingsPanelOpen);
+}
+
+function closeSettingsPanel() {
+  settingsPanelOpen = false;
+  settingsPanel.classList.remove('visible');
+}
+
+if (settingsBtn) {
+  settingsBtn.addEventListener('click', e => {
+    e.stopPropagation();
+    toggleSettingsPanel();
+  });
+}
+
+if (settingsPanel) {
+  // Stop panel clicks from bubbling to the document close-handler
+  settingsPanel.addEventListener('click', e => e.stopPropagation());
+
+  // Preset buttons — stamp a full set of step values into QS
+  settingsPanel.querySelectorAll('.sp-preset').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const preset = QUALITY_PRESETS[btn.dataset.preset];
+      if (preset) applyQS({ ...preset });
+    });
+  });
+
+  // Individual sliders → key maps to QS property names
+  const sliderKeyMap = {
+    'sq-pixelratio': 'pixelRatioStep',
+    'sq-overlay':    'overlayStep',
+    'sq-stars':      'starsStep',
+    'sq-milkyway':   'milkyWayStep',
+    'sq-nebula':     'nebulaStep',
+    'sq-meteors':    'meteors',
+  };
+  for (const [id, key] of Object.entries(sliderKeyMap)) {
+    const slider = document.getElementById(id);
+    if (slider) {
+      slider.addEventListener('input', e => {
+        applyQS({ [key]: Number(e.target.value) });
+      });
+    }
+  }
+
+  // Bloom toggle
+  const bloomTrack = document.getElementById('sq-bloom-track');
+  if (bloomTrack) {
+    bloomTrack.addEventListener('click', () => {
+      applyQS({ bloom: !QS.bloom });
+    });
+  }
+}
+
+// Close panel when clicking anywhere outside it
+document.addEventListener('click', () => closeSettingsPanel());
+
+// Initialise panel state to match current quality on load
+updateSettingsPanel();
+
 // ─── Keybinds ─────────────────────────────────────────────────────────────────
 
 window.addEventListener('keydown', e => {
+  if (e.key === 'q' || e.key === 'Q') {
+    toggleSettingsPanel();
+    return;
+  }
   if (e.key === 'd' || e.key === 'D') {
     demoActive ? stopDemo() : startDemo();
     return;
@@ -2678,7 +2954,7 @@ function animateFixed() {
   fpsFrames++;
   fpsAccum += dt;
   if (fpsAccum >= 1.0) {
-    fpsEl.textContent = `${Math.round(fpsFrames / fpsAccum)} FPS`;
+    fpsEl.textContent = `${Math.round(fpsFrames / fpsAccum)} FPS · ${deriveQualityLabel()}`;
     fpsFrames = 0;
     fpsAccum = 0;
   }
