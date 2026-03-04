@@ -106,6 +106,9 @@ function deriveQualityLabel() {
   return 'Custom';
 }
 
+// Cached quality label — recomputed only when applyQS() changes settings
+let _qualityLabel = deriveQualityLabel();
+
 // Apply initial pixel ratio + bloom from loaded QS
 renderer.setPixelRatio(qsPixelRatio());
 bloomPass.enabled = QS.bloom;
@@ -1488,7 +1491,7 @@ function seededRand(seed) {
 }
 
 function addSkyDome() {
-  const domeGeo = new THREE.SphereGeometry(560, 32, 32);
+  const domeGeo = new THREE.SphereGeometry(560, 8, 8);
   const domeMat = new THREE.ShaderMaterial({
     vertexShader: `
       varying vec3 vWorldPos;
@@ -1522,19 +1525,24 @@ function addSkyDome() {
 addSkyDome();
 
 // ─── Background star field ────────────────────────────────────────────────────
+// Pre-allocated at maximum capacity. Quality changes use setDrawRange() only —
+// no geometry rebuild, no material recompile, no GC stall.
 
-function createStarField(count = 7000) {
-  const positions = new Float32Array(count * 3);
-  const sizes = new Float32Array(count);
-  const colors = new Float32Array(count * 3);
-  const twinkleOff = new Float32Array(count); // per-star phase offset
+const SF_MAX = QS_STAR_STEPS[QS_STAR_STEPS.length - 1]; // 7000
+let starFieldPoints;
 
-  for (let i = 0; i < count; i++) {
+{
+  const positions  = new Float32Array(SF_MAX * 3);
+  const sizes      = new Float32Array(SF_MAX);
+  const colors     = new Float32Array(SF_MAX * 3);
+  const twinkleOff = new Float32Array(SF_MAX);
+
+  for (let i = 0; i < SF_MAX; i++) {
     const theta = Math.random() * Math.PI * 2;
     const phi = Math.acos(2 * Math.random() - 1);
     const r = 490 + Math.random() * 30;
 
-    positions[i * 3] = r * Math.sin(phi) * Math.cos(theta);
+    positions[i * 3]     = r * Math.sin(phi) * Math.cos(theta);
     positions[i * 3 + 1] = r * Math.cos(phi);
     positions[i * 3 + 2] = r * Math.sin(phi) * Math.sin(theta);
 
@@ -1563,13 +1571,14 @@ function createStarField(count = 7000) {
     twinkleOff[i] = Math.random() * Math.PI * 2;
   }
 
-  const geo = new THREE.BufferGeometry();
-  geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-  geo.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
-  geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-  geo.setAttribute('twinkleOff', new THREE.BufferAttribute(twinkleOff, 1));
+  const sfGeo = new THREE.BufferGeometry();
+  sfGeo.setAttribute('position',   new THREE.BufferAttribute(positions,  3));
+  sfGeo.setAttribute('size',       new THREE.BufferAttribute(sizes,      1));
+  sfGeo.setAttribute('color',      new THREE.BufferAttribute(colors,     3));
+  sfGeo.setAttribute('twinkleOff', new THREE.BufferAttribute(twinkleOff, 1));
+  sfGeo.setDrawRange(0, qsStarCount());
 
-  const mat = new THREE.ShaderMaterial({
+  const sfMat = new THREE.ShaderMaterial({
     uniforms: { uTime: { value: 0 } },
     vertexShader: `
       attribute float size;
@@ -1607,22 +1616,25 @@ function createStarField(count = 7000) {
     blending: THREE.AdditiveBlending,
   });
 
-  animatedMaterials.push(mat);
-  return new THREE.Points(geo, mat);
+  animatedMaterials.push(sfMat);
+  starFieldPoints = new THREE.Points(sfGeo, sfMat);
 }
 
-let starFieldPoints = createStarField(qsStarCount());
 scene.add(starFieldPoints);
 
 // ─── Milky Way ────────────────────────────────────────────────────────────────
+// Pre-allocated at maximum capacity. Quality changes use setDrawRange() only.
 
-function createMilkyWay(count) {
-  const positions = new Float32Array(count * 3);
-  const alphas = new Float32Array(count);
-  const colors = new Float32Array(count * 3);
+const MW_MAX = QS_MILKYWAY_STEPS[QS_MILKYWAY_STEPS.length - 1]; // 18000
+let milkyWayPoints;
+
+{
+  const positions = new Float32Array(MW_MAX * 3);
+  const alphas    = new Float32Array(MW_MAX);
+  const colors    = new Float32Array(MW_MAX * 3);
 
   // Milky Way is denser toward galactic centre (longitude ~0) and thinner at edges
-  for (let i = 0; i < count; i++) {
+  for (let i = 0; i < MW_MAX; i++) {
     const lon = Math.random() * Math.PI * 2;
     // Gaussian latitude — wider near centre, narrow at edges
     const centreWeight = 0.5 + 0.5 * Math.cos(lon);         // peaks at lon=0
@@ -1650,12 +1662,13 @@ function createMilkyWay(count) {
     colors[i * 3 + 2] = 0.95 - warm * 0.15;
   }
 
-  const geo = new THREE.BufferGeometry();
-  geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-  geo.setAttribute('alpha', new THREE.BufferAttribute(alphas, 1));
-  geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+  const mwGeo = new THREE.BufferGeometry();
+  mwGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  mwGeo.setAttribute('alpha',    new THREE.BufferAttribute(alphas,    1));
+  mwGeo.setAttribute('color',    new THREE.BufferAttribute(colors,    3));
+  mwGeo.setDrawRange(0, qsMilkyWayCount());
 
-  const mat = new THREE.ShaderMaterial({
+  const mwMat = new THREE.ShaderMaterial({
     vertexShader: `
       attribute float alpha;
       attribute vec3  color;
@@ -1684,10 +1697,9 @@ function createMilkyWay(count) {
     blending: THREE.AdditiveBlending,
   });
 
-  return new THREE.Points(geo, mat);
+  milkyWayPoints = new THREE.Points(mwGeo, mwMat);
 }
 
-let milkyWayPoints = createMilkyWay(qsMilkyWayCount());
 scene.add(milkyWayPoints);
 
 // (foreground dust removed — caused bloom oval artifact at screen center)
@@ -1837,7 +1849,7 @@ CONSTELLATIONS.forEach((con, ci) => {
   lx.textAlign = 'center';
   lx.textBaseline = 'middle';
   lx.fillText(con.name, 256, 56);
-  lx.fillText(con.name, 256, 56);
+
 
   const ltex = new THREE.CanvasTexture(lc);
   const lmat = new THREE.SpriteMaterial({
@@ -2383,13 +2395,16 @@ function positionMeteor(m, _dt) {
   const progress = m.t / m.life;
   const fade = Math.sin(progress * Math.PI);
 
-  const headPos3 = m.start.clone()
-    .add(m.dir.clone().multiplyScalar(m.t * m.speed))
-    .add(m.drift.clone().multiplyScalar(m.t * m.t * m.driftAmt));
-  headPos3.normalize().multiplyScalar(95 - progress * 3);
+  // headPos = start + dir*t*speed + drift*t²*driftAmt
+  _meteorHead.copy(m.start);
+  _meteorTmp.copy(m.dir).multiplyScalar(m.t * m.speed);
+  _meteorHead.add(_meteorTmp);
+  _meteorTmp.copy(m.drift).multiplyScalar(m.t * m.t * m.driftAmt);
+  _meteorHead.add(_meteorTmp);
+  _meteorHead.normalize().multiplyScalar(95 - progress * 3);
 
   const hArr = m.headGeo.attributes.position.array;
-  hArr[0] = headPos3.x; hArr[1] = headPos3.y; hArr[2] = headPos3.z;
+  hArr[0] = _meteorHead.x; hArr[1] = _meteorHead.y; hArr[2] = _meteorHead.z;
   m.headGeo.attributes.position.needsUpdate = true;
   m.headOpUniform.value = fade * m.brightness;
 }
@@ -2405,8 +2420,8 @@ const rtParams = {
   format: THREE.RGBAFormat,
   type: THREE.HalfFloatType,
 };
-let meteorRtA = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight, rtParams);
-let meteorRtB = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight, rtParams);
+let meteorRtA = new THREE.WebGLRenderTarget(Math.ceil(window.innerWidth / 2), Math.ceil(window.innerHeight / 2), rtParams);
+let meteorRtB = new THREE.WebGLRenderTarget(Math.ceil(window.innerWidth / 2), Math.ceil(window.innerHeight / 2), rtParams);
 
 // Uniform array: up to MAX_METEORS NDC positions, opacity, and core color per meteor
 const meteorNdcUniforms = meteors.map(() => new THREE.Vector2(-10, -10));
@@ -2417,7 +2432,7 @@ const meteorColorUniforms = meteors.map(() => new THREE.Color(1, 1, 1));
 const meteorFeedbackMat = new THREE.ShaderMaterial({
   uniforms: {
     uPrevFrame: { value: meteorRtA.texture },
-    uResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+    uResolution: { value: new THREE.Vector2(Math.ceil(window.innerWidth / 2), Math.ceil(window.innerHeight / 2)) },
     uMeteorPos: { value: meteorNdcUniforms },
     uMeteorPrev: { value: meteorPrevUniforms },
     uMeteorOp: { value: meteorOpUniforms },
@@ -2552,6 +2567,14 @@ const overlayCompositeMat = new THREE.ShaderMaterial({
 });
 const overlayCompositeMesh = new THREE.Mesh(fsQuadGeo, overlayCompositeMat);
 
+// Add all fullscreen pass meshes to orthoScene once — visibility is toggled
+// per-pass in the render loop rather than add/remove each frame.
+overlayMesh.visible           = false;
+overlayCompositeMesh.visible  = false;
+meteorFeedbackMesh.visible    = false;
+meteorCompositeMesh.visible   = false;
+orthoScene.add(overlayMesh, overlayCompositeMesh, meteorFeedbackMesh, meteorCompositeMesh);
+
 // ─── Quality control ──────────────────────────────────────────────────────────
 
 // Apply all settings from the current QS state to the renderer and scene.
@@ -2580,21 +2603,11 @@ function applyQS(overrides) {
     Math.floor(window.innerHeight * OVERLAY_SCALE),
   );
 
-  // 4. Background star field — rebuild geometry
-  scene.remove(starFieldPoints);
-  const sfIdx = animatedMaterials.indexOf(starFieldPoints.material);
-  if (sfIdx !== -1) animatedMaterials.splice(sfIdx, 1);
-  starFieldPoints.geometry.dispose();
-  starFieldPoints.material.dispose();
-  starFieldPoints = createStarField(qsStarCount());
-  scene.add(starFieldPoints);
+  // 4. Background star field — update draw range (no rebuild)
+  starFieldPoints.geometry.setDrawRange(0, qsStarCount());
 
-  // 5. Milky Way — rebuild geometry
-  scene.remove(milkyWayPoints);
-  milkyWayPoints.geometry.dispose();
-  milkyWayPoints.material.dispose();
-  milkyWayPoints = createMilkyWay(qsMilkyWayCount());
-  scene.add(milkyWayPoints);
+  // 5. Milky Way — update draw range (no rebuild)
+  milkyWayPoints.geometry.setDrawRange(0, qsMilkyWayCount());
 
   // 6. Nebula fractal iterations
   const [iter1, iter2] = qsNebulaIters();
@@ -2618,6 +2631,7 @@ function applyQS(overrides) {
     }
   });
 
+  _qualityLabel = deriveQualityLabel();
   updateSettingsPanel();
 }
 
@@ -2632,9 +2646,9 @@ window.addEventListener('resize', () => {
   bloomPass.setSize(Math.floor(window.innerWidth / 2), Math.floor(window.innerHeight / 2));
   overlayMat.uniforms.uResolution.value.set(Math.floor(window.innerWidth * OVERLAY_SCALE), Math.floor(window.innerHeight * OVERLAY_SCALE));
   overlayRt.setSize(Math.floor(window.innerWidth * OVERLAY_SCALE), Math.floor(window.innerHeight * OVERLAY_SCALE));
-  meteorRtA.setSize(window.innerWidth, window.innerHeight);
-  meteorRtB.setSize(window.innerWidth, window.innerHeight);
-  meteorFeedbackMat.uniforms.uResolution.value.set(window.innerWidth, window.innerHeight);
+  meteorRtA.setSize(Math.ceil(window.innerWidth / 2), Math.ceil(window.innerHeight / 2));
+  meteorRtB.setSize(Math.ceil(window.innerWidth / 2), Math.ceil(window.innerHeight / 2));
+  meteorFeedbackMat.uniforms.uResolution.value.set(Math.ceil(window.innerWidth / 2), Math.ceil(window.innerHeight / 2));
   meteorCompositeMat.uniforms.uResolution.value.set(window.innerWidth, window.innerHeight);
 });
 
@@ -2646,6 +2660,19 @@ const infoTranslation = document.getElementById('con-translation');
 const infoDesc = document.getElementById('con-desc');
 let infoIndex = -1;   // index of constellation currently shown (-1 = none)
 let infoFadeOut = false; // mid-fade-out transition in progress
+
+// Text size for the info panel — base multiplier (1.0 = default CSS sizes)
+const INFO_SIZE_MIN = 0.6;
+const INFO_SIZE_MAX = 2.0;
+const INFO_SIZE_STEP = 0.1;
+let infoTextSize = parseFloat(localStorage.getItem('cfs_infoTextSize') || '1.0');
+
+function applyInfoTextSize() {
+  infoName.style.fontSize         = `${(20 * infoTextSize).toFixed(1)}px`;
+  infoTranslation.style.fontSize  = `${(13 * infoTextSize).toFixed(1)}px`;
+  infoDesc.style.fontSize         = `${(14 * infoTextSize).toFixed(1)}px`;
+}
+applyInfoTextSize();
 
 function showConstellationInfo(ci) {
   const con = CONSTELLATIONS[ci];
@@ -2694,7 +2721,7 @@ function startDemoFly(activeIdx) {
   // Called when the camera begins flying to a new constellation.
   // Only dim everything down and hide the panel — highlights apply on arrival.
   constellationObjects.forEach((obj, i) => {
-    obj.dimTarget = (i === activeIdx) ? 0.06 : 0.06; // all dim during transit
+    obj.dimTarget = 0.06; // all dim during transit
     obj.label.userData.demoActive = (i === activeIdx); // label flag set early
   });
   // Hide the panel immediately; it will re-show once the camera arrives
@@ -2834,7 +2861,7 @@ function updateSettingsPanel() {
   if (bloomLabel) bloomLabel.textContent = QS.bloom ? 'On' : 'Off';
 
   // Preset buttons — highlight active preset if current QS matches one
-  const activePreset = deriveQualityLabel();
+  const activePreset = _qualityLabel;
   settingsPanel.querySelectorAll('.sp-preset').forEach(el => {
     el.classList.toggle('active', el.dataset.preset === activePreset);
   });
@@ -2918,6 +2945,21 @@ window.addEventListener('keydown', e => {
     demoJumpTo(demoIndex + (e.key === 'ArrowRight' ? 1 : -1));
     return;
   }
+  // Adjust info panel text size
+  if (e.key === 'PageUp') {
+    e.preventDefault();
+    infoTextSize = parseFloat(Math.min(INFO_SIZE_MAX, infoTextSize + INFO_SIZE_STEP).toFixed(2));
+    localStorage.setItem('cfs_infoTextSize', String(infoTextSize));
+    applyInfoTextSize();
+    return;
+  }
+  if (e.key === 'PageDown') {
+    e.preventDefault();
+    infoTextSize = parseFloat(Math.max(INFO_SIZE_MIN, infoTextSize - INFO_SIZE_STEP).toFixed(2));
+    localStorage.setItem('cfs_infoTextSize', String(infoTextSize));
+    applyInfoTextSize();
+    return;
+  }
   // Adjust demo timings (only meaningful during demo, but allowed anytime)
   if (e.key === ']') {
     DEMO_HOLD = Math.min(300, DEMO_HOLD + 5);
@@ -2939,10 +2981,18 @@ let lastTime = 0;
 const fpsEl = document.getElementById('fps');
 let fpsFrames = 0, fpsAccum = 0;
 
+// Per-phase CPU timing accumulators (ms totals over the current 1-second window)
+let _tDemo = 0, _tCons = 0, _tMeteors = 0, _tRender = 0;
+
 // Pre-allocated temporaries (avoid per-frame allocation)
 const _projMat = new THREE.Matrix4();
 const _camDir = new THREE.Vector3();
 const _tmpV4 = new THREE.Vector4();
+const _slerpFrom = new THREE.Vector3();
+const _slerpTo   = new THREE.Vector3();
+const _slerpDir  = new THREE.Vector3();
+const _meteorHead = new THREE.Vector3();
+const _meteorTmp  = new THREE.Vector3();
 
 function animateFixed() {
   requestAnimationFrame(animateFixed);
@@ -2950,16 +3000,26 @@ function animateFixed() {
   const dt = Math.min(0.05, Math.max(0.0001, t - lastTime));
   lastTime = t;
 
-  // FPS counter — update display once per second
+  // FPS counter + per-phase timing — update display once per second
   fpsFrames++;
   fpsAccum += dt;
   if (fpsAccum >= 1.0) {
-    fpsEl.textContent = `${Math.round(fpsFrames / fpsAccum)} FPS · ${deriveQualityLabel()}`;
-    fpsFrames = 0;
-    fpsAccum = 0;
+    const f = fpsFrames;
+    const fps = Math.round(f / fpsAccum);
+    const d  = (_tDemo    / f).toFixed(2);
+    const c  = (_tCons    / f).toFixed(2);
+    const m  = (_tMeteors / f).toFixed(2);
+    const r  = (_tRender  / f).toFixed(2);
+    const total = (_tDemo + _tCons + _tMeteors + _tRender) / f;
+    fpsEl.textContent =
+      `${fps} FPS · ${total.toFixed(2)}ms/frame · ${_qualityLabel}\n` +
+      `demo ${d}ms  cons ${c}ms  meteors ${m}ms  render ${r}ms`;
+    fpsFrames = 0; fpsAccum = 0;
+    _tDemo = 0; _tCons = 0; _tMeteors = 0; _tRender = 0;
   }
 
   // ── Demo mode update ───────────────────────────────────────────────────────
+  const _t0 = performance.now();
   if (demoActive) {
     demoTimer += dt;
 
@@ -2972,10 +3032,10 @@ function animateFixed() {
         ? 2 * demoCamT * demoCamT
         : 1 - Math.pow(-2 * demoCamT + 2, 2) / 2;
       // Slerp between the two unit directions, then scale to camera distance
-      const fromDir = demoCamFrom.clone().normalize();
-      const toDir = demoCamTo.clone().normalize();
-      const slerpDir = fromDir.clone().lerp(toDir, ease).normalize();
-      camera.position.copy(slerpDir.multiplyScalar(CAMERA_DIST));
+      _slerpFrom.copy(demoCamFrom).normalize();
+      _slerpTo.copy(demoCamTo).normalize();
+      _slerpDir.copy(_slerpFrom).lerp(_slerpTo, ease).normalize();
+      camera.position.copy(_slerpDir.multiplyScalar(CAMERA_DIST));
       camera.lookAt(0, 0, 0);
       // Sync OrbitControls internal state to match so it doesn't fight us
       controls.target.set(0, 0, 0);
@@ -2999,11 +3059,25 @@ function animateFixed() {
 
   animatedMaterials.forEach(m => { if (m.uniforms?.uTime) m.uniforms.uTime.value = t; });
   overlayMat.uniforms.uTime.value = t;
+  const _t1 = performance.now();
+  _tDemo += _t1 - _t0;
 
-  // ── Smooth dim transitions ─────────────────────────────────────────────────
-  const DIM_SPEED_DOWN = 3.0; // dimming speed (units: 1/sec)
-  const DIM_SPEED_UP = 0.6; // brightening speed — slower fade-in
-  constellationObjects.forEach((obj, ci) => {
+  // ── Single pass over all 88 constellations ────────────────────────────────
+  // Handles: dim transitions, screen-space projection, label opacity,
+  // and free-look focus detection — all in one traversal.
+  const DIM_SPEED_DOWN = 3.0;
+  const DIM_SPEED_UP   = 0.6;
+  _projMat.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
+  _camDir.copy(camera.position).normalize();
+
+  let bestIndex = -1;
+  let bestDot   = 0.6; // free-look focus threshold
+  let si = 0;
+
+  for (let ci = 0; ci < constellationObjects.length; ci++) {
+    const obj = constellationObjects[ci];
+
+    // 1. Smooth dim transition
     const diff = obj.dimTarget - obj.uDim.value;
     if (Math.abs(diff) > 0.0001) {
       const speed = diff > 0 ? DIM_SPEED_UP : DIM_SPEED_DOWN;
@@ -3012,54 +3086,50 @@ function animateFixed() {
       obj.uDim.value = obj.dimTarget;
     }
     conDimValues[ci] = obj.uDim.value;
-  });
 
-  // ── Project constellation star positions to screen space ───────────────────
-  {
-    _projMat.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
-    _camDir.copy(camera.position).normalize();
-    let si = 0;
-    constellationObjects.forEach((obj, ci) => {
-      // Back-face cull: skip overlay for constellations behind camera
-      const dot = obj.centroidDir.x * _camDir.x + obj.centroidDir.y * _camDir.y + obj.centroidDir.z * _camDir.z;
-      overlayMat.uniforms.uConDim.value[ci] = dot > 0.3 ? 0.0 : obj.uDim.value;
-      obj.worldPositions.forEach(wp => {
-        _tmpV4.set(wp.x, wp.y, wp.z, 1.0).applyMatrix4(_projMat);
-        const w = _tmpV4.w;
-        const px = si * 4;
-        if (w <= 0) {
-          starPosData[px] = -10; starPosData[px + 1] = -10;
-        } else {
-          starPosData[px] = _tmpV4.x / w; starPosData[px + 1] = _tmpV4.y / w;
-        }
-        si++;
-      });
-    });
-    starPosTex.needsUpdate = true;
+    // 2. Back-face cull + overlay dim
+    const dot = obj.centroidDir.x * _camDir.x + obj.centroidDir.y * _camDir.y + obj.centroidDir.z * _camDir.z;
+    overlayMat.uniforms.uConDim.value[ci] = dot > 0.3 ? 0.0 : obj.uDim.value;
+
+    // 3. Project star positions to NDC
+    for (let wi = 0; wi < obj.worldPositions.length; wi++) {
+      const wp = obj.worldPositions[wi];
+      _tmpV4.set(wp.x, wp.y, wp.z, 1.0).applyMatrix4(_projMat);
+      const w = _tmpV4.w;
+      const px = si * 4;
+      if (w <= 0) {
+        starPosData[px] = -10; starPosData[px + 1] = -10;
+      } else {
+        starPosData[px] = _tmpV4.x / w; starPosData[px + 1] = _tmpV4.y / w;
+      }
+      si++;
+    }
+
+    // 4. Label opacity
+    const label = constellationLabels[ci];
+    const normal = label.userData.normal;
+    if (normal) {
+      const facing = normal.dot(_camDir);
+      const fade = THREE.MathUtils.smoothstep(facing, -0.25, 0.35);
+      const maxOpacity = (label.userData.demoActive === false) ? 0.05 : 0.88;
+      label.material.opacity = Math.min(maxOpacity, 0.18 + fade * 0.7);
+    }
+
+    // 5. Free-look: find best-centred constellation
+    if (!demoActive) {
+      const d = -dot; // centroidDir · camDir, negated for "facing camera"
+      if (d > bestDot) { bestDot = d; bestIndex = ci; }
+    }
   }
 
-  constellationLabels.forEach(label => {
-    const normal = label.userData.normal;
-    if (!normal) return;
-    const facing = normal.dot(_camDir);
-    const fade = THREE.MathUtils.smoothstep(facing, -0.25, 0.35);
-    const maxOpacity = (label.userData.demoActive === false) ? 0.05 : 0.88;
-    label.material.opacity = Math.min(maxOpacity, 0.18 + fade * 0.7);
-  });
+  starPosTex.needsUpdate = true;
 
   // ── Constellation info panel (free-look mode only) ─────────────────────────
   if (!demoActive) {
-    let bestIndex = -1;
-    let bestDot = 0.6; // threshold — must be this centered to show panel
-    constellationObjects.forEach((obj, i) => {
-      const d = -obj.centroidDir.dot(_camDir);
-      if (d > bestDot) { bestDot = d; bestIndex = i; }
-    });
     if (bestIndex !== -1) {
-      // Dim all but the focused constellation
-      constellationObjects.forEach((obj, i) => {
-        obj.dimTarget = (i === bestIndex) ? 1.0 : 0.06;
-      });
+      for (let i = 0; i < constellationObjects.length; i++) {
+        constellationObjects[i].dimTarget = (i === bestIndex) ? 1.0 : 0.06;
+      }
       if (infoIndex === -1 && !infoFadeOut) {
         showConstellationInfo(bestIndex);
       } else if (bestIndex !== infoIndex && !infoFadeOut) {
@@ -3067,7 +3137,9 @@ function animateFixed() {
       }
     } else {
       // Nothing focused — restore all to full brightness
-      constellationObjects.forEach(obj => { obj.dimTarget = 1.0; });
+      for (let i = 0; i < constellationObjects.length; i++) {
+        constellationObjects[i].dimTarget = 1.0;
+      }
       if (infoIndex !== -1 && !infoFadeOut) {
         hideConstellationInfo(() => { infoIndex = -1; });
       }
@@ -3080,28 +3152,27 @@ function animateFixed() {
       obj.rotation.x += obj.userData.spinSpeed * 0.25 * dt;
     }
   });
+  const _t2 = performance.now();
+  _tCons += _t2 - _t1;
 
   updateMeteors(dt);
 
   // ── Project meteor head positions to NDC for feedback shader ───────────────
   {
-    const projMat = new THREE.Matrix4().multiplyMatrices(
-      camera.projectionMatrix, camera.matrixWorldInverse
-    );
-    const tmpV = new THREE.Vector4();
+    _projMat.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
     meteors.forEach((m, i) => {
       // Save last frame's NDC before overwriting
       meteorPrevUniforms[i].copy(m.ndcPos);
 
       const arr = m.headGeo.attributes.position.array;
-      tmpV.set(arr[0], arr[1], arr[2], 1.0).applyMatrix4(projMat);
-      const w = tmpV.w;
+      _tmpV4.set(arr[0], arr[1], arr[2], 1.0).applyMatrix4(_projMat);
+      const w = _tmpV4.w;
       if (w <= 0 || m.headOpUniform.value < 0.001) {
         m.ndcPos.set(-10, -10);
         meteorNdcUniforms[i].set(-10, -10);
         meteorPrevUniforms[i].set(-10, -10); // don't draw a segment to off-screen
       } else {
-        m.ndcPos.set(tmpV.x / w, tmpV.y / w);
+        m.ndcPos.set(_tmpV4.x / w, _tmpV4.y / w);
         meteorNdcUniforms[i].copy(m.ndcPos);
       }
       meteorOpUniforms[i] = m.headOpUniform.value;
@@ -3110,16 +3181,18 @@ function animateFixed() {
     meteorFeedbackMat.uniforms.uMeteorOp.value = meteorOpUniforms;
     meteorFeedbackMat.uniforms.uMeteorColor.value = meteorColorUniforms;
   }
+  const _t3 = performance.now();
+  _tMeteors += _t3 - _t2;
 
   // ── Meteor feedback ping-pong ───────────────────────────────────────────────
   // 1. Render feedback (prev RT → write to meteorRtB)
   meteorFeedbackMat.uniforms.uPrevFrame.value = meteorRtA.texture;
-  orthoScene.add(meteorFeedbackMesh);
+  meteorFeedbackMesh.visible = true;
   renderer.setRenderTarget(meteorRtB);
   renderer.autoClear = true;
   renderer.render(orthoScene, orthoCamera);
   renderer.autoClear = true;
-  orthoScene.remove(meteorFeedbackMesh);
+  meteorFeedbackMesh.visible = false;
 
   // 2. Render 3D scene + bloom to screen
   renderer.setRenderTarget(null);
@@ -3130,28 +3203,29 @@ function animateFixed() {
   // 3. Render constellation overlay at half resolution into RT
   renderer.setRenderTarget(overlayRt);
   renderer.autoClear = true;
-  orthoScene.add(overlayMesh);
+  overlayMesh.visible = true;
   renderer.render(orthoScene, orthoCamera);
-  orthoScene.remove(overlayMesh);
+  overlayMesh.visible = false;
 
   // 3b. Composite overlay RT onto screen (additive)
   renderer.setRenderTarget(null);
   renderer.autoClear = false;
-  orthoScene.add(overlayCompositeMesh);
+  overlayCompositeMesh.visible = true;
   renderer.render(orthoScene, orthoCamera);
-  orthoScene.remove(overlayCompositeMesh);
+  overlayCompositeMesh.visible = false;
 
   // 4. Composite feedback trail additively over the finished frame
   //    Must NOT auto-clear here or we erase the bloom output
   meteorCompositeMat.uniforms.uTrail.value = meteorRtB.texture;
-  orthoScene.add(meteorCompositeMesh);
+  meteorCompositeMesh.visible = true;
   renderer.autoClear = false;
   renderer.render(orthoScene, orthoCamera);
   renderer.autoClear = true;
-  orthoScene.remove(meteorCompositeMesh);
+  meteorCompositeMesh.visible = false;
 
   // Swap ping-pong targets: what we just wrote (meteorRtB) becomes next frame's "prev"
   const tmp = meteorRtA; meteorRtA = meteorRtB; meteorRtB = tmp;
+  _tRender += performance.now() - _t3;
 }
 
 animateFixed();
