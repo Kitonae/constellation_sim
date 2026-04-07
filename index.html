@@ -29,12 +29,12 @@
     #vignette {
       position: fixed;
       inset: 0;
-      background: radial-gradient(ellipse at center,
-          transparent 55%,
-          rgba(0, 0, 8, 0.55) 80%,
-          rgba(0, 0, 12, 0.92) 100%);
       pointer-events: none;
       z-index: 1;
+    }
+    #vignette canvas {
+      width: 100%;
+      height: 100%;
     }
 
     #grain {
@@ -509,6 +509,29 @@
       </div>
     </div>
     <div class="sp-row">
+      <span class="sp-label">Vignette</span>
+      <div class="sp-toggle">
+        <div class="sp-toggle-track" id="sq-vignette-track">
+          <div class="sp-toggle-thumb"></div>
+        </div>
+        <span class="sp-toggle-label" id="sq-vignette-label"></span>
+      </div>
+    </div>
+    <div class="sp-row">
+      <span class="sp-label">Sky dome</span>
+      <div class="sp-toggle">
+        <div class="sp-toggle-track" id="sq-skydome-track">
+          <div class="sp-toggle-thumb"></div>
+        </div>
+        <span class="sp-toggle-label" id="sq-skydome-label"></span>
+      </div>
+    </div>
+    <div class="sp-row">
+      <span class="sp-label">Anti-aliasing</span>
+      <input class="sp-slider" id="sq-aa" type="range" min="0" max="2" step="1">
+      <span class="sp-val" id="sq-aa-val"></span>
+    </div>
+    <div class="sp-row">
       <span class="sp-label">Overlay res.</span>
       <input class="sp-slider" id="sq-overlay" type="range" min="1" max="4" step="1">
       <span class="sp-val" id="sq-overlay-val"></span>
@@ -551,6 +574,46 @@
   <div id="demo-badge">Demo</div>
   <div id="demo-timing"></div>
 
+  <script>
+    // Render vignette to canvas with dithering to avoid CSS gradient banding
+    (function() {
+      const el = document.getElementById('vignette');
+      const c = document.createElement('canvas');
+      el.appendChild(c);
+      function draw() {
+        c.width = window.innerWidth;
+        c.height = window.innerHeight;
+        const ctx = c.getContext('2d');
+        const img = ctx.createImageData(c.width, c.height);
+        const d = img.data;
+        const cx = c.width / 2, cy = c.height / 2;
+        const maxR = Math.sqrt(cx * cx + cy * cy);
+        for (let y = 0; y < c.height; y++) {
+          for (let x = 0; x < c.width; x++) {
+            const dx = x - cx, dy = y - cy;
+            const r = Math.sqrt(dx * dx + dy * dy) / maxR;
+            // Vignette: transparent center, dark edges
+            let a = 0;
+            if (r > 0.45) {
+              const t = (r - 0.45) / 0.55; // 0..1
+              a = t * t * 0.92;
+            }
+            // Dither: ±0.5/255 noise to break banding
+            const noise = (Math.random() - 0.5) * (2 / 255);
+            a = Math.max(0, Math.min(1, a + noise));
+            const px = (y * c.width + x) * 4;
+            d[px]     = 0;
+            d[px + 1] = 0;
+            d[px + 2] = Math.round(8 + a * 4); // slight blue tint
+            d[px + 3] = Math.round(a * 255);
+          }
+        }
+        ctx.putImageData(img, 0, 0);
+      }
+      draw();
+      window.addEventListener('resize', draw);
+    })();
+  </script>
   <script type="importmap">
     {
       "imports": {

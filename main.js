@@ -11,6 +11,7 @@ import {
 import {
   renderer, scene, camera, controls, composer, bloomPass,
   clock, animatedMaterials, orthoScene, orthoCamera,
+  fxaaPass, smaaPass,
 } from './src/core.js';
 import { createSkyDome } from './src/sky-dome.js';
 import { createStarField } from './src/star-field.js';
@@ -28,7 +29,9 @@ import { initResize } from './src/resize.js';
 
 // ─── Subsystem initialization ────────────────────────────────────────────────
 
-createSkyDome(scene);
+const skyDomeMesh = createSkyDome(scene);
+skyDomeMesh.visible = QS.skydome;
+document.getElementById('vignette').style.display = QS.vignette ? '' : 'none';
 const starField = createStarField(scene, animatedMaterials);
 const milkyWay = createMilkyWay(scene, animatedMaterials);
 const nebulae = createNebulae(scene, raDecToVec3);
@@ -37,7 +40,13 @@ const {
   constellationObjects, constellationLabels, conDimValues, SPHERE_R, starOffsets, lineOffsets,
 } = createConstellations(scene, CONSTELLATIONS, raDecToVec3, seededRand, animatedMaterials);
 
-const { planetLabels } = createPlanets(scene, PLANETS, raDecToVec3, animatedMaterials, SPHERE_R);
+const { planetLabels, planetMaterials } = createPlanets(scene, PLANETS, raDecToVec3, animatedMaterials, SPHERE_R);
+
+// Precompute planet directions for free-look focus detection
+const planetDirs = PLANETS.map(p => {
+  const pos = raDecToVec3(p.ra, p.dec, SPHERE_R);
+  return pos.normalize();
+});
 
 const overlay = createOverlay(CONSTELLATIONS, constellationObjects, starOffsets, lineOffsets);
 const { overlayMat, overlayMesh, starPosData, starPosTex } = overlay;
@@ -76,6 +85,11 @@ function applyQS(overrides) {
   composer.setSize(window.innerWidth, window.innerHeight);
   bloomPass.enabled = QS.bloom;
   bloomPass.setSize(Math.floor(window.innerWidth / 2), Math.floor(window.innerHeight / 2));
+  skyDomeMesh.visible = QS.skydome;
+  document.getElementById('vignette').style.display = QS.vignette ? '' : 'none';
+  fxaaPass.enabled = (QS.aa === 1);
+  fxaaPass.uniforms['resolution'].value.set(1 / window.innerWidth, 1 / window.innerHeight);
+  smaaPass.enabled = (QS.aa === 2);
   overlay.setScale(qsOverlayScale());
   starField.setCount(qsStarCount());
   milkyWay.setCount(qsMilkyWayCount());
@@ -92,10 +106,12 @@ function applyQS(overrides) {
 const infoPanel = createInfoPanel(CONSTELLATIONS);
 const demo = createDemoMode(camera, controls, constellationObjects, infoPanel);
 const settingsPanel = initSettingsPanel(applyQS, () => _qualityLabel);
-initResize({ renderer, camera, composer, bloomPass, overlay, meteorSystem, qsPixelRatio });
-const moonData = PLANETS.find(p => p.isMoon);
-const moonPosition = moonData ? raDecToVec3(moonData.ra, moonData.dec, SPHERE_R) : null;
-initKeybinds({ settingsPanel, demo, infoPanel, moonPosition });
+initResize({ renderer, camera, composer, bloomPass, fxaaPass, overlay, meteorSystem, qsPixelRatio });
+// Build planet positions for zoom navigation (exclude hidden)
+const planetZoomTargets = PLANETS
+  .map((p, i) => ({ name: p.name, pos: raDecToVec3(p.ra, p.dec, SPHERE_R), isSun: p.isSun, hidden: p.hidden }))
+  .filter(p => !p.hidden);
+initKeybinds({ settingsPanel, demo, infoPanel, planetZoomTargets });
 
 // ─── Render loop ─────────────────────────────────────────────────────────────
 
@@ -226,7 +242,8 @@ function animate() {
     }
   }
 
-  // Planet label visibility
+  // Planet label visibility + free-look planet focus
+  let bestPlanetIndex = -1, bestPlanetDot = 0.985; // very tight ~10° cone for planets
   for (let pi = 0; pi < planetLabels.length; pi++) {
     const pl = planetLabels[pi];
     const normal = pl.userData.normal;
@@ -236,12 +253,48 @@ function animate() {
       pl.material.opacity = 0.15 + fade * 0.7;
     }
   }
+  if (!demo.isActive()) {
+    for (let pi = 0; pi < PLANETS.length; pi++) {
+      if (PLANETS[pi].hidden) continue;
+      const d = -planetDirs[pi].dot(_camDir); // negated: planet on far side, camera faces inward
+      if (d > bestPlanetDot) { bestPlanetDot = d; bestPlanetIndex = pi; }
+    }
+  }
 
   starPosTex.needsUpdate = true;
 
+  // Update planet opacity — focused planet lights up
+  if (!demo.isActive()) {
+    for (const [idx, mats] of Object.entries(planetMaterials)) {
+      const targetOpacity = (bestPlanetIndex !== -1 && Number(idx) === bestPlanetIndex) ? 1.0 : 0.45;
+      for (const m of mats) {
+        if (m.uniforms.uOpacity) {
+          const cur = m.uniforms.uOpacity.value;
+          m.uniforms.uOpacity.value += (targetOpacity - cur) * Math.min(1, 4 * dt);
+        }
+      }
+    }
+  }
+
   // Info panel (free-look mode only)
   if (!demo.isActive()) {
-    if (bestIndex !== -1) {
+    // Planet takes priority if focused (tighter cone)
+    const planetId = bestPlanetIndex !== -1 ? ('p:' + bestPlanetIndex) : null;
+
+    if (bestPlanetIndex !== -1) {
+      // Focused on a planet
+      for (let i = 0; i < constellationObjects.length; i++) {
+        constellationObjects[i].dimTarget = 0.06;
+      }
+      if (infoPanel.getIndex() !== planetId && !infoPanel.isFading()) {
+        if (infoPanel.getIndex() === -1) {
+          infoPanel.showPlanet(PLANETS[bestPlanetIndex], bestPlanetIndex);
+        } else {
+          infoPanel.hide(() => infoPanel.showPlanet(PLANETS[bestPlanetIndex], bestPlanetIndex));
+        }
+      }
+    } else if (bestIndex !== -1) {
+      // Focused on a constellation
       for (let i = 0; i < constellationObjects.length; i++) {
         constellationObjects[i].dimTarget = (i === bestIndex) ? 1.0 : 0.06;
       }
@@ -251,6 +304,7 @@ function animate() {
         infoPanel.hide(() => infoPanel.show(bestIndex));
       }
     } else {
+      // Nothing focused
       for (let i = 0; i < constellationObjects.length; i++) {
         constellationObjects[i].dimTarget = 1.0;
       }

@@ -5,7 +5,7 @@ export function createInfoPanel(CONSTELLATIONS) {
   const infoName = document.getElementById('con-name');
   const infoTranslation = document.getElementById('con-translation');
   const infoDesc = document.getElementById('con-desc');
-  let infoIndex = -1;
+  let infoIndex = -1;   // constellation index, or 'p:N' for planet index N
   let infoFadeOut = false;
 
   const INFO_SIZE_MIN = 0.6;
@@ -23,20 +23,29 @@ export function createInfoPanel(CONSTELLATIONS) {
   }
   applyInfoTextSize();
 
-  function show(ci) {
-    const con = CONSTELLATIONS[ci];
-    const col = new THREE.Color(con.color);
+  function showContent(name, translation, desc, color) {
+    const col = new THREE.Color(color);
     const r = Math.round(col.r * 255);
     const g = Math.round(col.g * 255);
     const b = Math.round(col.b * 255);
-    infoName.textContent = con.name;
+    infoName.textContent = name;
     infoName.style.textShadow = `0 0 14px rgba(${r},${g},${b},0.7)`;
-    infoTranslation.textContent = con.translation || '';
-    infoTranslation.style.display = con.translation ? '' : 'none';
-    infoDesc.textContent = con.desc;
+    infoTranslation.textContent = translation || '';
+    infoTranslation.style.display = translation ? '' : 'none';
+    infoDesc.textContent = desc;
     infoPanel.style.opacity = '1';
-    infoIndex = ci;
     infoFadeOut = false;
+  }
+
+  function show(ci) {
+    const con = CONSTELLATIONS[ci];
+    showContent(con.name, con.translation, con.desc, con.color);
+    infoIndex = ci;
+  }
+
+  function showPlanet(planet, planetIdx) {
+    showContent(planet.name, planet.translation, planet.desc, planet.color);
+    infoIndex = 'p:' + planetIdx;
   }
 
   function hide(onHidden) {
@@ -59,6 +68,7 @@ export function createInfoPanel(CONSTELLATIONS) {
 
   return {
     show,
+    showPlanet,
     hide,
     textSizeUp,
     textSizeDown,
