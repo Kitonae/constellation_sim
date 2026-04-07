@@ -1,4 +1,16 @@
-export function initKeybinds({ settingsPanel, demo, infoPanel, moonPosition }) {
+export function initKeybinds({ settingsPanel, demo, infoPanel, moonPosition, music }) {
+  const musicBadge = document.getElementById('music-badge');
+
+  function updateMusicBadge() {
+    if (!musicBadge) return;
+    if (music.isPlaying()) {
+      musicBadge.style.display = 'block';
+      musicBadge.textContent = '\u266B  Music ' + Math.round(music.getVolume() * 100) + '%';
+    } else {
+      musicBadge.style.display = 'none';
+    }
+  }
+
   window.addEventListener('keydown', e => {
     if (e.key === 'q' || e.key === 'Q') {
       settingsPanel.toggle();
@@ -10,6 +22,21 @@ export function initKeybinds({ settingsPanel, demo, infoPanel, moonPosition }) {
     }
     if (e.key === 'd' || e.key === 'D') {
       demo.isActive() ? demo.stop() : demo.start();
+      return;
+    }
+    if (e.key === 'm' || e.key === 'M') {
+      music.toggle();
+      updateMusicBadge();
+      return;
+    }
+    if (e.key === '-' || e.key === '_') {
+      music.setVolume(music.getVolume() - 0.1);
+      updateMusicBadge();
+      return;
+    }
+    if (e.key === '=' || e.key === '+') {
+      music.setVolume(music.getVolume() + 0.1);
+      updateMusicBadge();
       return;
     }
     if (demo.isActive() && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')) {

@@ -25,6 +25,7 @@ import { createDemoMode } from './src/demo.js';
 import { initSettingsPanel } from './src/settings-panel.js';
 import { initKeybinds } from './src/keybinds.js';
 import { initResize } from './src/resize.js';
+import { createMusic } from './src/music.js';
 
 // ─── Subsystem initialization ────────────────────────────────────────────────
 
@@ -93,9 +94,10 @@ const infoPanel = createInfoPanel(CONSTELLATIONS);
 const demo = createDemoMode(camera, controls, constellationObjects, infoPanel);
 const settingsPanel = initSettingsPanel(applyQS, () => _qualityLabel);
 initResize({ renderer, camera, composer, bloomPass, overlay, meteorSystem, qsPixelRatio });
+const music = createMusic();
 const moonData = PLANETS.find(p => p.isMoon);
 const moonPosition = moonData ? raDecToVec3(moonData.ra, moonData.dec, SPHERE_R) : null;
-initKeybinds({ settingsPanel, demo, infoPanel, moonPosition });
+initKeybinds({ settingsPanel, demo, infoPanel, moonPosition, music });
 
 // ─── Render loop ─────────────────────────────────────────────────────────────
 

@@ -183,6 +183,21 @@
       line-height: 1.7;
     }
 
+    #music-badge {
+      display: none;
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      color: rgba(160, 200, 255, 0.72);
+      font-family: 'Monda', monospace;
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      pointer-events: none;
+      user-select: none;
+      z-index: 2;
+      text-shadow: 0 0 10px rgba(120, 180, 255, 0.4);
+    }
+
     /* ── Settings button ─────────────────────────────────────────────────── */
     #settings-btn {
       position: fixed;
@@ -550,6 +565,7 @@
   <div id="fps">-- FPS</div>
   <div id="demo-badge">Demo</div>
   <div id="demo-timing"></div>
+  <div id="music-badge"></div>
 
   <script type="importmap">
     {
