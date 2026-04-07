@@ -2143,11 +2143,13 @@ const overlayMat = new THREE.ShaderMaterial({
       return g;
     }
 
-    float happyStar(vec2 uv, float anim) {
-      uv = abs(uv);
-      vec2 pos = min(uv.xy / max(uv.yx, vec2(0.0001)), anim);
-      float p = 2.0 - pos.x - pos.y;
-      return (2.0 + p * (p * p - 1.5)) / max(uv.x + uv.y, 0.0001);
+    float sparkleStar4(vec2 uv, float anim) {
+      float r2 = dot(uv, uv);
+      float r  = sqrt(r2) + 0.0001;
+      // cos(2θ) in Cartesian: peaks at cardinal axes, zero at diagonals
+      float cos2t   = (uv.x * uv.x - uv.y * uv.y) / r2;
+      float angular = pow(abs(cos2t), 3.0); // higher exponent → sharper concave sides
+      return (angular / r) * anim;
     }
 
     #define SHINE_SPEED 0.105
@@ -2158,13 +2160,19 @@ const overlayMat = new THREE.ShaderMaterial({
     vec3 StarShine(vec2 p, vec2 center, float t, vec3 tint) {
       vec2 d = p - center;
       float dist2 = dot(d, d);
-      if (dist2 > 0.001) return vec3(0.0);
+      if (dist2 > 0.004) return vec3(0.0); // wider radius so spikes can extend
 
       vec2 suv = d * SHINE_SCALE * 0.5;
       float seed = fract(center.x * 127.1 + center.y * 311.7);
       float st = (t + seed * 10.0) * SHINE_SPEED * 0.8;
 
-      float alpha = exp(-dot(suv, suv) / (SHINE_CORE * SHINE_CORE)) * 0.35;
+      // Directional alpha: suppress the flare at 45° diagonals so the
+      // circular Gaussian envelope never fills in between the 4 spike axes.
+      float suv2 = dot(suv, suv);
+      float cos2t_a = (suv.x * suv.x - suv.y * suv.y) / max(suv2, 0.0001);
+      float angular_a = pow(abs(cos2t_a), 2.5); // 0 at diagonals, 1 at axes
+      float alpha = exp(-suv2 / (SHINE_CORE * SHINE_CORE))
+                    * 0.35 * (0.04 + angular_a * 0.96);
       float angle = atan(suv.x, suv.y);
 
       float f  = shineFlare(angle, alpha, st) * 1.3;
@@ -2179,7 +2187,7 @@ const overlayMat = new THREE.ShaderMaterial({
       vec2 ruv = suv * (2.0 * (cos((t + seed * 10.0) * 2.0) - 2.5)) / SHINE_RAYS;
       float anim = sin((t + seed * 10.0) * 12.0) * 0.1 + 1.0;
       vec3 rayTint = mix(vec3(0.55, 0.5, 1.15), tint * 0.6 + 0.4, 0.5);
-      vec3 star = happyStar(ruv, anim) * rayTint;
+      vec3 star = sparkleStar4(ruv, anim) * rayTint;
       c *= star;
       c += star * 0.01;
 
@@ -2665,7 +2673,10 @@ let infoFadeOut = false; // mid-fade-out transition in progress
 const INFO_SIZE_MIN = 0.6;
 const INFO_SIZE_MAX = 2.0;
 const INFO_SIZE_STEP = 0.1;
-let infoTextSize = parseFloat(localStorage.getItem('cfs_infoTextSize') || '1.0');
+const _urlTextSize = parseFloat(new URLSearchParams(location.search).get('textSize'));
+let infoTextSize = !isNaN(_urlTextSize)
+  ? Math.min(INFO_SIZE_MAX, Math.max(INFO_SIZE_MIN, _urlTextSize))
+  : parseFloat(localStorage.getItem('cfs_infoTextSize') || '1.0');
 
 function applyInfoTextSize() {
   infoName.style.fontSize         = `${(20 * infoTextSize).toFixed(1)}px`;
@@ -2797,19 +2808,6 @@ function stopDemo() {
   }
 }
 
-// ─── Splash screen ────────────────────────────────────────────────────────────
-
-const splashEl = document.getElementById('splash');
-
-function dismissSplash() {
-  splashEl.classList.add('hidden');
-  splashEl.addEventListener('transitionend', () => splashEl.remove(), { once: true });
-}
-
-if (splashEl) {
-  splashEl.addEventListener('click', dismissSplash, { once: true });
-  document.addEventListener('keydown', dismissSplash, { once: true });
-}
 
 // ─── Settings panel ───────────────────────────────────────────────────────────
 
