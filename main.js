@@ -2066,6 +2066,8 @@ const overlayMat = new THREE.ShaderMaterial({
     uLineCount: { value: CONSTELLATIONS.map(c => c.lines.length) },
     uConColor: { value: CONSTELLATIONS.map(c => new THREE.Color(c.color)) },
     uConDim: { value: conDimArr.slice() },
+    uConCentroid: { value: Array.from({length: CON_COUNT}, () => new THREE.Vector2(-10, -10)) },
+    uConBoundR:   { value: new Float32Array(CON_COUNT).fill(0) },
   },
   vertexShader: `
     void main() {
@@ -2087,6 +2089,8 @@ const overlayMat = new THREE.ShaderMaterial({
     uniform int  uLineCount[NUM_CONS];
     uniform vec3  uConColor[NUM_CONS];
     uniform float uConDim[NUM_CONS];
+    uniform vec2  uConCentroid[NUM_CONS];
+    uniform float uConBoundR[NUM_CONS];
 
     out vec4 outColor;
 
@@ -2203,7 +2207,15 @@ const overlayMat = new THREE.ShaderMaterial({
 
       for (int ci = 0; ci < NUM_CONS; ci++) {
         float dim = uConDim[ci];
-        if (dim < 0.001) continue;
+        if (dim < 0.04) continue;
+
+        // Bounding circle cull — skip constellation if fragment is outside its screen-space extent
+        vec2 ctr = uConCentroid[ci];
+        if (ctr.x > -5.0) {
+          float dist2toCtr = dot(uv - ctr, uv - ctr);
+          float r = uConBoundR[ci] + 0.05;
+          if (dist2toCtr > r * r) continue;
+        }
 
         vec3 tint = uConColor[ci];
         int  sOff = uStarOffset[ci];
@@ -3103,6 +3115,36 @@ function animateFixed() {
       si++;
     }
 
+    // 3b. Compute screen-space bounding circle for overlay culling
+    {
+      const sOff = starOffsets[ci];
+      const nS   = CONSTELLATIONS[ci].stars.length;
+      const aspect = window.innerWidth / window.innerHeight;
+      let cx = 0, cy = 0, visCount = 0;
+      for (let k = 0; k < nS; k++) {
+        const px = (sOff + k) * 4;
+        const sx = starPosData[px], sy = starPosData[px + 1];
+        if (sx < -5) continue;
+        cx += sx * 0.5 * aspect; cy += sy * 0.5; visCount++;
+      }
+      if (visCount > 0) {
+        cx /= visCount; cy /= visCount;
+        let br = 0;
+        for (let k = 0; k < nS; k++) {
+          const px = (sOff + k) * 4;
+          const sx = starPosData[px], sy = starPosData[px + 1];
+          if (sx < -5) continue;
+          const dx = sx * 0.5 * aspect - cx, dy = sy * 0.5 - cy;
+          br = Math.max(br, Math.sqrt(dx * dx + dy * dy));
+        }
+        overlayMat.uniforms.uConCentroid.value[ci].set(cx, cy);
+        overlayMat.uniforms.uConBoundR.value[ci] = br;
+      } else {
+        overlayMat.uniforms.uConCentroid.value[ci].set(-10, -10);
+        overlayMat.uniforms.uConBoundR.value[ci] = 0;
+      }
+    }
+
     // 4. Label opacity
     const label = constellationLabels[ci];
     const normal = label.userData.normal;
@@ -3144,12 +3186,6 @@ function animateFixed() {
     }
   }
 
-  scene.children.forEach(obj => {
-    if (obj.userData.spinSpeed) {
-      obj.rotation.y += obj.userData.spinSpeed * dt;
-      obj.rotation.x += obj.userData.spinSpeed * 0.25 * dt;
-    }
-  });
   const _t2 = performance.now();
   _tCons += _t2 - _t1;
 
@@ -3157,7 +3193,6 @@ function animateFixed() {
 
   // ── Project meteor head positions to NDC for feedback shader ───────────────
   {
-    _projMat.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
     meteors.forEach((m, i) => {
       // Save last frame's NDC before overwriting
       meteorPrevUniforms[i].copy(m.ndcPos);
