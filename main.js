@@ -26,6 +26,7 @@ import { createDemoMode } from './src/demo.js';
 import { initSettingsPanel } from './src/settings-panel.js';
 import { initKeybinds } from './src/keybinds.js';
 import { initResize } from './src/resize.js';
+import { createMusic } from './src/music.js';
 
 // ─── Subsystem initialization ────────────────────────────────────────────────
 
@@ -108,11 +109,12 @@ const infoPanel = createInfoPanel(CONSTELLATIONS);
 const demo = createDemoMode(camera, controls, constellationObjects, infoPanel);
 const settingsPanel = initSettingsPanel(applyQS, () => _qualityLabel);
 initResize({ renderer, camera, composer, bloomPass, fxaaPass, overlay, meteorSystem, qsPixelRatio });
+const music = createMusic();
 // Build planet positions for zoom navigation (exclude hidden)
 const planetZoomTargets = PLANETS
   .map((p, i) => ({ name: p.name, pos: raDecToVec3(p.ra, p.dec, SPHERE_R), isSun: p.isSun, hidden: p.hidden }))
   .filter(p => !p.hidden);
-initKeybinds({ settingsPanel, demo, infoPanel, planetZoomTargets });
+initKeybinds({ settingsPanel, demo, infoPanel, planetZoomTargets, music });
 
 // ─── Render loop ─────────────────────────────────────────────────────────────
 

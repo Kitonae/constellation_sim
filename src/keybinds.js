@@ -11,7 +11,7 @@ const VIEW_DIST = {
   Neptune: 6,
 };
 
-export function initKeybinds({ settingsPanel, demo, infoPanel, planetZoomTargets }) {
+export function initKeybinds({ settingsPanel, demo, infoPanel, planetZoomTargets, music }) {
   let zoomIndex = -1; // -1 = not zoomed, otherwise index into planetZoomTargets
   let zoomed = false;
 
@@ -26,6 +26,18 @@ export function initKeybinds({ settingsPanel, demo, infoPanel, planetZoomTargets
     const target = planetZoomTargets[idx];
     const dist = VIEW_DIST[target.name] || 6;
     demo.flyToPosition(target.pos, dist);
+  }
+
+  const musicBadge = document.getElementById('music-badge');
+
+  function updateMusicBadge() {
+    if (!musicBadge) return;
+    if (music.isPlaying()) {
+      musicBadge.style.display = 'block';
+      musicBadge.textContent = '\u266B  Music ' + Math.round(music.getVolume() * 100) + '%';
+    } else {
+      musicBadge.style.display = 'none';
+    }
   }
 
   window.addEventListener('keydown', e => {
@@ -58,6 +70,21 @@ export function initKeybinds({ settingsPanel, demo, infoPanel, planetZoomTargets
     }
     if (e.key === 'd' || e.key === 'D') {
       demo.isActive() ? demo.stop() : demo.start();
+      return;
+    }
+    if (e.key === 'm' || e.key === 'M') {
+      music.toggle();
+      updateMusicBadge();
+      return;
+    }
+    if (e.key === '-' || e.key === '_') {
+      music.setVolume(music.getVolume() - 0.1);
+      updateMusicBadge();
+      return;
+    }
+    if (e.key === '=' || e.key === '+') {
+      music.setVolume(music.getVolume() + 0.1);
+      updateMusicBadge();
       return;
     }
     if (demo.isActive() && !zoomed && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')) {
