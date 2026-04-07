@@ -1998,6 +1998,117 @@ const mergedCoreMat = new THREE.ShaderMaterial({
 scene.add(new THREE.Points(mergedGeo, mergedCoreMat));
 animatedMaterials.push(mergedCoreMat);
 
+// ─── Planets ──────────────────────────────────────────────────────────────────
+// Approximate positions for 2026-04-07 (RA in degrees, Dec in degrees)
+
+const PLANETS = [
+  { name: 'Mercury', ra: 13.4,  dec:  6.2,  color: '#aaaaaa', mag:  1.0 },
+  { name: 'Venus',   ra: 315.2, dec: -18.1, color: '#ffe8b0', mag: -4.5 },
+  { name: 'Mars',    ra: 109.8, dec:  26.3, color: '#e8704a', mag:  1.0 },
+  { name: 'Jupiter', ra: 68.4,  dec:  19.8, color: '#d4b896', mag: -2.0 },
+  { name: 'Saturn',  ra: 352.6, dec:  -6.4, color: '#e8d5a3', mag:  1.1 },
+  { name: 'Uranus',  ra: 48.2,  dec:  17.6, color: '#7de8e8', mag:  5.7 },
+  { name: 'Neptune', ra: 358.1, dec:  -2.8, color: '#4b70dd', mag:  8.0 },
+];
+
+const planetPositions = PLANETS.map(p => raDecToVec3(p.ra, p.dec, SPHERE_R));
+
+const planetGeo = new THREE.BufferGeometry();
+const _pPos   = new Float32Array(PLANETS.length * 3);
+const _pSizes = new Float32Array(PLANETS.length);
+const _pCols  = new Float32Array(PLANETS.length * 3);
+
+PLANETS.forEach((p, i) => {
+  const pos = planetPositions[i];
+  _pPos[i * 3]     = pos.x;
+  _pPos[i * 3 + 1] = pos.y;
+  _pPos[i * 3 + 2] = pos.z;
+  // Map magnitude to point size: brighter = larger
+  _pSizes[i] = Math.max(4, 15 - p.mag * 1.8);
+  const col = new THREE.Color(p.color);
+  _pCols[i * 3]     = col.r;
+  _pCols[i * 3 + 1] = col.g;
+  _pCols[i * 3 + 2] = col.b;
+});
+
+planetGeo.setAttribute('position', new THREE.BufferAttribute(_pPos,   3));
+planetGeo.setAttribute('pSize',    new THREE.BufferAttribute(_pSizes, 1));
+planetGeo.setAttribute('pColor',   new THREE.BufferAttribute(_pCols,  3));
+
+const planetMat = new THREE.ShaderMaterial({
+  uniforms: { uTime: { value: 0 } },
+  vertexShader: `
+    attribute float pSize;
+    attribute vec3  pColor;
+    uniform   float uTime;
+    varying   vec3  vColor;
+    void main() {
+      vColor = pColor;
+      vec4 mv = modelViewMatrix * vec4(position, 1.0);
+      float pulse = 1.0 + sin(uTime * 0.35) * 0.05;
+      gl_PointSize = pSize * pulse * (300.0 / -mv.z);
+      gl_Position  = projectionMatrix * mv;
+    }
+  `,
+  fragmentShader: `
+    varying vec3 vColor;
+    void main() {
+      vec2  uv = gl_PointCoord - 0.5;
+      float d  = length(uv);
+      if (d > 0.5) discard;
+      float core = exp(-d * d * 22.0);
+      float halo = exp(-d * d * 4.5) * 0.55;
+      // Subtle diffraction cross
+      float cx = exp(-uv.x * uv.x * 220.0) * exp(-uv.y * uv.y * 4.0) * 0.25;
+      float cy = exp(-uv.y * uv.y * 220.0) * exp(-uv.x * uv.x * 4.0) * 0.25;
+      float a  = core + halo + cx + cy;
+      gl_FragColor = vec4(mix(vec3(1.0), vColor, 0.55 + d), a);
+    }
+  `,
+  transparent: true,
+  depthWrite: false,
+  blending: THREE.AdditiveBlending,
+});
+
+scene.add(new THREE.Points(planetGeo, planetMat));
+animatedMaterials.push(planetMat);
+
+// ── Planet labels ─────────────────────────────────────────────────────────────
+const planetLabels = [];
+
+PLANETS.forEach((p, i) => {
+  const col = new THREE.Color(p.color);
+  const lc = document.createElement('canvas');
+  lc.width = 256; lc.height = 64;
+  const lx = lc.getContext('2d');
+  lx.shadowColor = `rgb(${Math.round(col.r*255)},${Math.round(col.g*255)},${Math.round(col.b*255)})`;
+  lx.shadowBlur = 16;
+  lx.font = 'italic 22px Monda, sans-serif';
+  lx.fillStyle = 'rgba(255,255,255,0.85)';
+  lx.textAlign = 'center';
+  lx.textBaseline = 'middle';
+  lx.fillText(p.name, 128, 32);
+
+  const ltex = new THREE.CanvasTexture(lc);
+  const lmat = new THREE.SpriteMaterial({
+    map: ltex, transparent: true, opacity: 0.85,
+    depthWrite: false, blending: THREE.AdditiveBlending,
+  });
+  const ls = new THREE.Sprite(lmat);
+  const dir = planetPositions[i].clone().normalize();
+  // Offset label slightly perpendicular-up from the planet
+  const up = new THREE.Vector3(0, 1, 0);
+  const right = dir.clone().cross(up).normalize();
+  const labelUp = dir.clone().cross(right).normalize();
+  ls.position.copy(
+    planetPositions[i].clone().addScaledVector(labelUp, SPHERE_R * 0.04)
+  );
+  ls.scale.set(8, 2.2, 1);
+  scene.add(ls);
+  ls.userData.normal = planetPositions[i].clone().normalize();
+  planetLabels.push(ls);
+});
+
 // ─── Art Of Code constellation overlay ───────────────────────────────────────
 // Fullscreen screen-space quad. Each frame we project the 3D star positions
 // to NDC and upload them as uniforms. The shader draws sparkles + glowing lines
@@ -3159,6 +3270,17 @@ function animateFixed() {
     if (!demoActive) {
       const d = -dot; // centroidDir · camDir, negated for "facing camera"
       if (d > bestDot) { bestDot = d; bestIndex = ci; }
+    }
+  }
+
+  // ── Planet label visibility ────────────────────────────────────────────────
+  for (let pi = 0; pi < planetLabels.length; pi++) {
+    const pl = planetLabels[pi];
+    const normal = pl.userData.normal;
+    if (normal) {
+      const facing = normal.dot(_camDir);
+      const fade = THREE.MathUtils.smoothstep(facing, -0.2, 0.3);
+      pl.material.opacity = 0.15 + fade * 0.7;
     }
   }
 
