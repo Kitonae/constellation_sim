@@ -62,6 +62,11 @@ export function initSettingsPanel(applyQS, getQualityLabel) {
     const skydomeLabel = document.getElementById('sq-skydome-label');
     if (skydomeLabel) skydomeLabel.textContent = QS.skydome ? 'On' : 'Off';
 
+    const showFpsTrack = document.getElementById('sq-showfps-track');
+    if (showFpsTrack) showFpsTrack.classList.toggle('on', QS.showFps);
+    const showFpsLabel = document.getElementById('sq-showfps-label');
+    if (showFpsLabel) showFpsLabel.textContent = QS.showFps ? 'On' : 'Off';
+
     const activePreset = getQualityLabel();
     settingsPanel.querySelectorAll('.sp-preset').forEach(el => {
       el.classList.toggle('active', el.dataset.preset === activePreset);
@@ -131,6 +136,13 @@ export function initSettingsPanel(applyQS, getQualityLabel) {
     if (skydomeTrack2) {
       skydomeTrack2.addEventListener('click', () => {
         applyQS({ skydome: !QS.skydome });
+      });
+    }
+
+    const showFpsTrack2 = document.getElementById('sq-showfps-track');
+    if (showFpsTrack2) {
+      showFpsTrack2.addEventListener('click', () => {
+        applyQS({ showFps: !QS.showFps });
       });
     }
   }

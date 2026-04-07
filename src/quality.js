@@ -23,13 +23,14 @@ const QS_DEFAULTS = {
   milkyWayStep: 5,
   nebulaStep: 5,
   meteors: 3,
+  showFps: false,
 };
 
 // Preset stamps — set of step values for Low / Medium / High
 export const QUALITY_PRESETS = {
-  Low:    { pixelRatioStep:1, bloom:false, aa:0, skydome:false, vignette:false, overlayStep:1, starsStep:1, milkyWayStep:1, nebulaStep:1, meteors:0 },
-  Medium: { pixelRatioStep:2, bloom:true,  aa:1, skydome:true,  vignette:true,  overlayStep:2, starsStep:3, milkyWayStep:3, nebulaStep:3, meteors:1 },
-  High:   { pixelRatioStep:3, bloom:true,  aa:2, skydome:true,  vignette:true,  overlayStep:4, starsStep:5, milkyWayStep:5, nebulaStep:5, meteors:3 },
+  Low:    { pixelRatioStep:1, bloom:false, aa:0, skydome:false, vignette:false, overlayStep:1, starsStep:1, milkyWayStep:1, nebulaStep:1, meteors:0, showFps:false },
+  Medium: { pixelRatioStep:2, bloom:true,  aa:1, skydome:true,  vignette:true,  overlayStep:2, starsStep:3, milkyWayStep:3, nebulaStep:3, meteors:1, showFps:false },
+  High:   { pixelRatioStep:3, bloom:true,  aa:2, skydome:true,  vignette:true,  overlayStep:4, starsStep:5, milkyWayStep:5, nebulaStep:5, meteors:3, showFps:false },
 };
 
 export function qsLoad() {

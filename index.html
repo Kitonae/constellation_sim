@@ -54,6 +54,10 @@
       text-shadow: 0 0 18px rgba(120, 160, 255, 0.6);
     }
 
+    @media (orientation: portrait) {
+      #title { display: none; }
+    }
+
     #info {
       position: fixed;
       bottom: 28px;
@@ -540,6 +544,19 @@
       <span class="sp-label">Meteors</span>
       <input class="sp-slider" id="sq-meteors" type="range" min="0" max="3" step="1">
       <span class="sp-val" id="sq-meteors-val"></span>
+    </div>
+
+    <div class="sp-divider"></div>
+    <div class="sp-heading">Debug</div>
+
+    <div class="sp-row">
+      <span class="sp-label">FPS counter</span>
+      <div class="sp-toggle">
+        <div class="sp-toggle-track" id="sq-showfps-track">
+          <div class="sp-toggle-thumb"></div>
+        </div>
+        <span class="sp-toggle-label" id="sq-showfps-label"></span>
+      </div>
     </div>
   </div>
   <div id="constellation-info">

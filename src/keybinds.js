@@ -29,6 +29,11 @@ export function initKeybinds({ settingsPanel, demo, infoPanel, planetZoomTargets
   }
 
   window.addEventListener('keydown', e => {
+    if (e.key === 'f' || e.key === 'F') {
+      const el = document.getElementById('fps');
+      if (el) el.style.display = el.style.display === 'none' ? '' : 'none';
+      return;
+    }
     if (e.key === 'q' || e.key === 'Q') {
       settingsPanel.toggle();
       return;

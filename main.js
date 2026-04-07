@@ -86,6 +86,7 @@ function applyQS(overrides) {
   bloomPass.enabled = QS.bloom;
   bloomPass.setSize(Math.floor(window.innerWidth / 2), Math.floor(window.innerHeight / 2));
   skyDomeMesh.visible = QS.skydome;
+  document.getElementById('fps').style.display = QS.showFps ? '' : 'none';
   document.getElementById('vignette').style.display = QS.vignette ? '' : 'none';
   fxaaPass.enabled = (QS.aa === 1);
   fxaaPass.uniforms['resolution'].value.set(1 / window.innerWidth, 1 / window.innerHeight);
