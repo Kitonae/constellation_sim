@@ -1,5 +1,5 @@
 import {
-  QS, QS_PIXEL_RATIO_LABELS, QS_OVERLAY_STEPS,
+  QS, QS_PIXEL_RATIO_LABELS, QS_OVERLAY_STEPS, QS_AA_LABELS,
   QS_STAR_STEPS, QS_MILKYWAY_STEPS, QUALITY_PRESETS,
 } from './quality.js';
 
@@ -13,6 +13,7 @@ export function initSettingsPanel(applyQS, getQualityLabel) {
 
     const sliders = {
       'sq-pixelratio': QS.pixelRatioStep,
+      'sq-aa':         QS.aa,
       'sq-overlay':    QS.overlayStep,
       'sq-stars':      QS.starsStep,
       'sq-milkyway':   QS.milkyWayStep,
@@ -26,6 +27,9 @@ export function initSettingsPanel(applyQS, getQualityLabel) {
 
     const pixelRatioVal = document.getElementById('sq-pixelratio-val');
     if (pixelRatioVal) pixelRatioVal.textContent = QS_PIXEL_RATIO_LABELS[QS.pixelRatioStep - 1];
+
+    const aaVal = document.getElementById('sq-aa-val');
+    if (aaVal) aaVal.textContent = QS_AA_LABELS[QS.aa];
 
     const overlayVal = document.getElementById('sq-overlay-val');
     if (overlayVal) overlayVal.textContent = `${Math.round(QS_OVERLAY_STEPS[QS.overlayStep - 1] * 100)}%`;
@@ -47,6 +51,21 @@ export function initSettingsPanel(applyQS, getQualityLabel) {
     if (bloomTrack) bloomTrack.classList.toggle('on', QS.bloom);
     const bloomLabel = document.getElementById('sq-bloom-label');
     if (bloomLabel) bloomLabel.textContent = QS.bloom ? 'On' : 'Off';
+
+    const vignetteTrack = document.getElementById('sq-vignette-track');
+    if (vignetteTrack) vignetteTrack.classList.toggle('on', QS.vignette);
+    const vignetteLabel = document.getElementById('sq-vignette-label');
+    if (vignetteLabel) vignetteLabel.textContent = QS.vignette ? 'On' : 'Off';
+
+    const skydomeTrack = document.getElementById('sq-skydome-track');
+    if (skydomeTrack) skydomeTrack.classList.toggle('on', QS.skydome);
+    const skydomeLabel = document.getElementById('sq-skydome-label');
+    if (skydomeLabel) skydomeLabel.textContent = QS.skydome ? 'On' : 'Off';
+
+    const showFpsTrack = document.getElementById('sq-showfps-track');
+    if (showFpsTrack) showFpsTrack.classList.toggle('on', QS.showFps);
+    const showFpsLabel = document.getElementById('sq-showfps-label');
+    if (showFpsLabel) showFpsLabel.textContent = QS.showFps ? 'On' : 'Off';
 
     const activePreset = getQualityLabel();
     settingsPanel.querySelectorAll('.sp-preset').forEach(el => {
@@ -83,6 +102,7 @@ export function initSettingsPanel(applyQS, getQualityLabel) {
 
     const sliderKeyMap = {
       'sq-pixelratio': 'pixelRatioStep',
+      'sq-aa':         'aa',
       'sq-overlay':    'overlayStep',
       'sq-stars':      'starsStep',
       'sq-milkyway':   'milkyWayStep',
@@ -102,6 +122,27 @@ export function initSettingsPanel(applyQS, getQualityLabel) {
     if (bloomTrack) {
       bloomTrack.addEventListener('click', () => {
         applyQS({ bloom: !QS.bloom });
+      });
+    }
+
+    const vignetteTrack2 = document.getElementById('sq-vignette-track');
+    if (vignetteTrack2) {
+      vignetteTrack2.addEventListener('click', () => {
+        applyQS({ vignette: !QS.vignette });
+      });
+    }
+
+    const skydomeTrack2 = document.getElementById('sq-skydome-track');
+    if (skydomeTrack2) {
+      skydomeTrack2.addEventListener('click', () => {
+        applyQS({ skydome: !QS.skydome });
+      });
+    }
+
+    const showFpsTrack2 = document.getElementById('sq-showfps-track');
+    if (showFpsTrack2) {
+      showFpsTrack2.addEventListener('click', () => {
+        applyQS({ showFps: !QS.showFps });
       });
     }
   }

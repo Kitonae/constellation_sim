@@ -1,4 +1,33 @@
-export function initKeybinds({ settingsPanel, demo, infoPanel, moonPosition, music }) {
+// View distances per planet (how far the camera sits from the body)
+const VIEW_DIST = {
+  Sun: 10,
+  Moon: 8,
+  Mercury: 4,
+  Venus: 5,
+  Mars: 5,
+  Jupiter: 8,
+  Saturn: 8,
+  Uranus: 6,
+  Neptune: 6,
+};
+
+export function initKeybinds({ settingsPanel, demo, infoPanel, planetZoomTargets, music }) {
+  let zoomIndex = -1; // -1 = not zoomed, otherwise index into planetZoomTargets
+  let zoomed = false;
+
+  // Find Moon as default Z target
+  const moonIdx = planetZoomTargets.findIndex(p => p.name === 'Moon');
+  const defaultZoomIdx = moonIdx !== -1 ? moonIdx : 0;
+
+  function zoomTo(idx) {
+    if (idx < 0 || idx >= planetZoomTargets.length) return;
+    zoomIndex = idx;
+    zoomed = true;
+    const target = planetZoomTargets[idx];
+    const dist = VIEW_DIST[target.name] || 6;
+    demo.flyToPosition(target.pos, dist);
+  }
+
   const musicBadge = document.getElementById('music-badge');
 
   function updateMusicBadge() {
@@ -12,12 +41,31 @@ export function initKeybinds({ settingsPanel, demo, infoPanel, moonPosition, mus
   }
 
   window.addEventListener('keydown', e => {
+    if (e.key === 'f' || e.key === 'F') {
+      const el = document.getElementById('fps');
+      if (el) el.style.display = el.style.display === 'none' ? '' : 'none';
+      return;
+    }
     if (e.key === 'q' || e.key === 'Q') {
       settingsPanel.toggle();
       return;
     }
-    if ((e.key === 'z' || e.key === 'Z') && moonPosition) {
-      demo.flyToPosition(moonPosition, 8);
+    if (e.key === 'z' || e.key === 'Z') {
+      if (!zoomed) {
+        zoomTo(defaultZoomIdx);
+      } else {
+        // Zoom out — flyToPosition toggles back
+        zoomed = false;
+        zoomIndex = -1;
+        demo.flyToPosition(planetZoomTargets[defaultZoomIdx].pos, 8);
+      }
+      return;
+    }
+    if (zoomed && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')) {
+      e.preventDefault();
+      const delta = e.key === 'ArrowRight' ? 1 : -1;
+      const next = (zoomIndex + delta + planetZoomTargets.length) % planetZoomTargets.length;
+      zoomTo(next);
       return;
     }
     if (e.key === 'd' || e.key === 'D') {
@@ -39,7 +87,7 @@ export function initKeybinds({ settingsPanel, demo, infoPanel, moonPosition, mus
       updateMusicBadge();
       return;
     }
-    if (demo.isActive() && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')) {
+    if (demo.isActive() && !zoomed && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')) {
       e.preventDefault();
       demo.jumpTo(demo.getIndex() + (e.key === 'ArrowRight' ? 1 : -1));
       return;

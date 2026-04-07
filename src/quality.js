@@ -8,22 +8,29 @@ export const QS_NEBULA_STEPS      = [[4,8],[6,9],[8,12],[10,15],[13,18]];
 // Pixel ratio step labels shown in the value readout
 export const QS_PIXEL_RATIO_LABELS = ['0.5×','0.75×','1×', window.devicePixelRatio > 1 ? `${Math.min(window.devicePixelRatio,2).toFixed(1)}×` : 'Native'];
 
+// Anti-aliasing modes: 0=Off, 1=FXAA, 2=SMAA
+export const QS_AA_LABELS = ['Off', 'FXAA', 'SMAA'];
+
 // Default settings (High quality)
 const QS_DEFAULTS = {
   pixelRatioStep: 3,   // index into QS_PIXEL_RATIO_STEPS
   bloom: true,
+  aa: 2,               // 0=Off, 1=FXAA, 2=SMAA
+  skydome: true,
+  vignette: true,
   overlayStep: 4,      // 1-based to match slider min=1
   starsStep: 5,
   milkyWayStep: 5,
   nebulaStep: 5,
   meteors: 3,
+  showFps: false,
 };
 
 // Preset stamps — set of step values for Low / Medium / High
 export const QUALITY_PRESETS = {
-  Low:    { pixelRatioStep:1, bloom:false, overlayStep:1, starsStep:1, milkyWayStep:1, nebulaStep:1, meteors:0 },
-  Medium: { pixelRatioStep:2, bloom:true,  overlayStep:2, starsStep:3, milkyWayStep:3, nebulaStep:3, meteors:1 },
-  High:   { pixelRatioStep:3, bloom:true,  overlayStep:4, starsStep:5, milkyWayStep:5, nebulaStep:5, meteors:3 },
+  Low:    { pixelRatioStep:1, bloom:false, aa:0, skydome:false, vignette:false, overlayStep:1, starsStep:1, milkyWayStep:1, nebulaStep:1, meteors:0, showFps:false },
+  Medium: { pixelRatioStep:2, bloom:true,  aa:1, skydome:true,  vignette:true,  overlayStep:2, starsStep:3, milkyWayStep:3, nebulaStep:3, meteors:1, showFps:false },
+  High:   { pixelRatioStep:3, bloom:true,  aa:2, skydome:true,  vignette:true,  overlayStep:4, starsStep:5, milkyWayStep:5, nebulaStep:5, meteors:3, showFps:false },
 };
 
 export function qsLoad() {
