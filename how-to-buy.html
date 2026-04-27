@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>How to Buy &middot; The Celestial Firmament</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Monda:wght@400;700&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      background: #00000a;
+      color: rgba(210, 228, 255, 0.88);
+      font-family: 'Monda', 'Georgia', sans-serif;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      background:
+        radial-gradient(ellipse at 20% -10%, rgba(40, 70, 140, 0.18) 0%, transparent 55%),
+        radial-gradient(ellipse at 90% 110%, rgba(60, 30, 110, 0.18) 0%, transparent 55%),
+        #00000a;
+      overflow-x: hidden;
+    }
+
+    /* faint star-field backdrop */
+    .stars {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background-image:
+        radial-gradient(1px 1px at 12% 18%, rgba(220, 230, 255, 0.85), transparent 60%),
+        radial-gradient(1px 1px at 27% 64%, rgba(200, 220, 255, 0.6), transparent 60%),
+        radial-gradient(1px 1px at 41% 32%, rgba(255, 255, 255, 0.7), transparent 60%),
+        radial-gradient(1px 1px at 58% 88%, rgba(180, 210, 255, 0.55), transparent 60%),
+        radial-gradient(1px 1px at 70% 14%, rgba(220, 235, 255, 0.8), transparent 60%),
+        radial-gradient(1px 1px at 83% 49%, rgba(190, 220, 255, 0.65), transparent 60%),
+        radial-gradient(1px 1px at 92% 78%, rgba(255, 255, 255, 0.55), transparent 60%),
+        radial-gradient(1px 1px at 6% 82%, rgba(200, 220, 255, 0.5), transparent 60%),
+        radial-gradient(1px 1px at 35% 8%, rgba(255, 255, 255, 0.45), transparent 60%);
+    }
+
+    /* radial vignette overlay */
+    .vignette {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      background: radial-gradient(ellipse at center,
+        transparent 35%,
+        rgba(0, 0, 10, 0.55) 80%,
+        rgba(0, 0, 10, 0.92) 100%);
+    }
+
+    /* ── Top nav ── */
+    nav.top {
+      position: relative;
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 22px 36px;
+      border-bottom: 1px solid rgba(100, 140, 220, 0.12);
+    }
+
+    nav.top .brand {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.45em;
+      text-transform: uppercase;
+      color: rgba(190, 215, 255, 0.92);
+      text-shadow: 0 0 18px rgba(120, 160, 255, 0.5);
+      text-decoration: none;
+    }
+
+    nav.top .links {
+      display: flex;
+      gap: 28px;
+    }
+
+    nav.top .links a {
+      font-size: 11px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: rgba(160, 185, 230, 0.65);
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+    nav.top .links a:hover,
+    nav.top .links a.active {
+      color: rgba(210, 230, 255, 0.95);
+    }
+
+    /* ── Layout container ── */
+    main {
+      position: relative;
+      z-index: 5;
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 64px 36px 96px;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      text-align: center;
+      padding: 32px 0 56px;
+      border-bottom: 1px solid rgba(100, 140, 220, 0.14);
+      margin-bottom: 64px;
+    }
+
+    .eyebrow {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.45em;
+      text-transform: uppercase;
+      color: rgba(160, 190, 255, 0.6);
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      font-size: 52px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(230, 240, 255, 0.95);
+      text-shadow: 0 0 28px rgba(120, 160, 255, 0.35);
+      margin-bottom: 22px;
+    }
+
+    .lede {
+      max-width: 720px;
+      margin: 0 auto;
+      font-size: 15px;
+      line-height: 1.85;
+      color: rgba(190, 210, 240, 0.78);
+      letter-spacing: 0.02em;
+    }
+
+    /* ── Section heading style ── */
+    h2 {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.45em;
+      text-transform: uppercase;
+      color: rgba(170, 200, 245, 0.85);
+      margin-bottom: 26px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(100, 140, 220, 0.16);
+    }
+
+    section {
+      margin-bottom: 72px;
+    }
+
+    p {
+      font-size: 14px;
+      line-height: 1.85;
+      color: rgba(200, 218, 245, 0.78);
+      margin-bottom: 14px;
+      letter-spacing: 0.015em;
+    }
+
+    /* ── Steps ── */
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+    }
+
+    .step {
+      position: relative;
+      padding: 22px 20px 26px;
+      border: 1px solid rgba(100, 140, 220, 0.18);
+      border-radius: 6px;
+      background: rgba(8, 12, 30, 0.55);
+      transition: border-color 0.2s, background 0.2s, transform 0.2s;
+    }
+    .step:hover {
+      border-color: rgba(140, 180, 255, 0.5);
+      background: rgba(14, 22, 50, 0.7);
+      transform: translateY(-2px);
+    }
+
+    .step-num {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.3em;
+      color: rgba(140, 180, 255, 0.65);
+      margin-bottom: 12px;
+    }
+
+    .step h3 {
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: rgba(220, 232, 255, 0.92);
+      margin-bottom: 10px;
+    }
+
+    .step p {
+      font-size: 12.5px;
+      line-height: 1.7;
+      color: rgba(180, 200, 235, 0.7);
+      margin: 0;
+    }
+
+    /* ── Editions table ── */
+    .editions {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .edition {
+      padding: 28px 24px 30px;
+      border: 1px solid rgba(100, 140, 220, 0.18);
+      border-radius: 6px;
+      background: rgba(6, 10, 26, 0.6);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .edition.featured {
+      border-color: rgba(150, 190, 255, 0.45);
+      background: linear-gradient(180deg,
+        rgba(20, 36, 80, 0.55) 0%,
+        rgba(6, 10, 26, 0.6) 100%);
+      box-shadow: 0 0 60px rgba(80, 130, 255, 0.08);
+    }
+
+    .edition-tag {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: rgba(140, 180, 255, 0.7);
+      margin-bottom: 6px;
+    }
+
+    .edition h3 {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(225, 238, 255, 0.96);
+      margin-bottom: 4px;
+    }
+
+    .edition .price {
+      font-size: 13px;
+      letter-spacing: 0.1em;
+      color: rgba(190, 215, 255, 0.85);
+      margin-bottom: 18px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid rgba(100, 140, 220, 0.14);
+    }
+
+    .edition ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      flex: 1;
+    }
+
+    .edition li {
+      font-size: 13px;
+      line-height: 1.7;
+      color: rgba(195, 215, 245, 0.78);
+      padding: 7px 0 7px 22px;
+      position: relative;
+      letter-spacing: 0.01em;
+    }
+    .edition li::before {
+      content: "";
+      position: absolute;
+      left: 4px;
+      top: 14px;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: rgba(140, 180, 255, 0.7);
+      box-shadow: 0 0 8px rgba(120, 170, 255, 0.6);
+    }
+
+    /* ── Partners region map ── */
+    .regions {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    .region {
+      padding: 18px 18px 20px;
+      border: 1px solid rgba(100, 140, 220, 0.16);
+      border-radius: 4px;
+      background: rgba(8, 12, 30, 0.5);
+    }
+
+    .region h4 {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: rgba(180, 205, 250, 0.82);
+      margin-bottom: 10px;
+    }
+
+    .region p {
+      font-size: 12.5px;
+      line-height: 1.7;
+      color: rgba(170, 195, 235, 0.7);
+      margin: 0;
+    }
+
+    /* ── Buttons ── */
+    .button-row {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-top: 28px;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 12px 26px;
+      border: 1px solid rgba(120, 170, 255, 0.45);
+      border-radius: 4px;
+      background: transparent;
+      color: rgba(200, 220, 255, 0.92);
+      font-family: 'Monda', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s, border-color 0.2s;
+    }
+    .btn:hover {
+      background: rgba(100, 140, 255, 0.14);
+      border-color: rgba(160, 200, 255, 0.7);
+      color: rgba(225, 240, 255, 1.0);
+    }
+    .btn.primary {
+      background: rgba(80, 130, 255, 0.18);
+      border-color: rgba(140, 180, 255, 0.6);
+    }
+    .btn.primary:hover {
+      background: rgba(100, 150, 255, 0.28);
+    }
+
+    /* ── FAQ ── */
+    .faq details {
+      border-bottom: 1px solid rgba(100, 140, 220, 0.14);
+      padding: 18px 0;
+    }
+    .faq details:last-child { border-bottom: none; }
+    .faq summary {
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: rgba(210, 228, 255, 0.9);
+      list-style: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .faq summary::-webkit-details-marker { display: none; }
+    .faq summary::after {
+      content: "+";
+      color: rgba(140, 180, 255, 0.7);
+      font-weight: 400;
+      font-size: 18px;
+      transition: transform 0.2s;
+    }
+    .faq details[open] summary::after {
+      content: "\2212";
+    }
+    .faq details p {
+      margin-top: 12px;
+      font-size: 13px;
+      color: rgba(180, 200, 235, 0.75);
+    }
+
+    /* ── Contact ── */
+    .contact {
+      text-align: center;
+      padding: 48px 32px;
+      border: 1px solid rgba(100, 140, 220, 0.2);
+      border-radius: 6px;
+      background:
+        radial-gradient(ellipse at center, rgba(30, 50, 110, 0.18) 0%, transparent 70%),
+        rgba(6, 10, 26, 0.6);
+    }
+    .contact h2 {
+      border-bottom: none;
+      padding-bottom: 0;
+      margin-bottom: 14px;
+    }
+    .contact .lede { font-size: 14px; }
+    .contact .button-row { justify-content: center; }
+
+    /* ── Footer ── */
+    footer {
+      position: relative;
+      z-index: 5;
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 28px 36px 40px;
+      border-top: 1px solid rgba(100, 140, 220, 0.12);
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(140, 170, 220, 0.55);
+    }
+    footer a {
+      color: rgba(160, 190, 235, 0.7);
+      text-decoration: none;
+    }
+    footer a:hover { color: rgba(200, 220, 255, 0.95); }
+
+    /* ── Responsive ── */
+    @media (max-width: 880px) {
+      h1 { font-size: 38px; letter-spacing: 0.14em; }
+      .steps { grid-template-columns: repeat(2, 1fr); }
+      .editions { grid-template-columns: 1fr; }
+      .regions { grid-template-columns: repeat(2, 1fr); }
+      nav.top { padding: 18px 22px; }
+      nav.top .links { gap: 16px; }
+      nav.top .links a { font-size: 10px; letter-spacing: 0.22em; }
+      main { padding: 40px 22px 64px; }
+    }
+    @media (max-width: 520px) {
+      .steps { grid-template-columns: 1fr; }
+      .regions { grid-template-columns: 1fr; }
+      nav.top .brand { font-size: 11px; letter-spacing: 0.32em; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="stars" aria-hidden="true"></div>
+  <div class="vignette" aria-hidden="true"></div>
+
+  <nav class="top">
+    <a class="brand" href="index.html">The Celestial Firmament</a>
+    <div class="links">
+      <a href="index.html">Explore</a>
+      <a href="how-to-buy.html" class="active">How to Buy</a>
+      <a href="mailto:sales@celestial-firmament.example">Contact</a>
+    </div>
+  </nav>
+
+  <main>
+    <section class="hero">
+      <div class="eyebrow">Licensing &amp; Partners</div>
+      <h1>How to Buy</h1>
+      <p class="lede">
+        The Celestial Firmament is sold direct and through a worldwide network of
+        accredited partners. Whether you are licensing a single workstation for a
+        planetarium kiosk or rolling out a fleet for a permanent installation, the
+        path to purchase is the same in four short steps.
+      </p>
+    </section>
+
+    <section>
+      <h2>Four steps to your license</h2>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">Step 01</div>
+          <h3>Find a partner</h3>
+          <p>Locate an accredited reseller in your region using the partner directory below, or contact us directly for territories without a local partner.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">Step 02</div>
+          <h3>Request a quote</h3>
+          <p>Share your project scope &mdash; number of seats, deployment surface, support tier &mdash; and your partner will return a tailored quotation within two business days.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">Step 03</div>
+          <h3>Place your order</h3>
+          <p>Confirm the quote, sign the licence agreement, and complete payment through your partner. Educational and non-profit pricing is available on request.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">Step 04</div>
+          <h3>Activate &amp; deploy</h3>
+          <p>You will receive licence keys and download links by email within one business day. Activation is one-click and works fully offline after first use.</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Choose your edition</h2>
+      <div class="editions">
+        <div class="edition">
+          <div class="edition-tag">Personal</div>
+          <h3>Observer</h3>
+          <div class="price">Free &mdash; perpetual</div>
+          <ul>
+            <li>Single workstation, non-commercial use</li>
+            <li>Full constellation atlas, 88 IAU figures</li>
+            <li>Community support via the Forum</li>
+            <li>Quarterly content updates</li>
+          </ul>
+        </div>
+        <div class="edition featured">
+          <div class="edition-tag">Most popular</div>
+          <h3>Composer</h3>
+          <div class="price">From &euro;490 &middot; per seat / year</div>
+          <ul>
+            <li>Commercial use &mdash; planetariums, venues, AV studios</li>
+            <li>4K rendering, multi-display output, custom palettes</li>
+            <li>Show timeline &amp; presenter mode</li>
+            <li>Email support, 1 business day response</li>
+            <li>Includes all minor &amp; major updates</li>
+          </ul>
+        </div>
+        <div class="edition">
+          <div class="edition-tag">Enterprise</div>
+          <h3>Firmament</h3>
+          <div class="price">Custom &middot; volume &amp; site licences</div>
+          <ul>
+            <li>Site, fleet and floating-seat licensing</li>
+            <li>8K and dome-warp output, edge-blend correction</li>
+            <li>SSO, audit logging, on-premise activation server</li>
+            <li>Priority support with named engineer</li>
+            <li>Optional on-site commissioning</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Sales partners worldwide</h2>
+      <p>
+        Our partners are trained, certified and equipped to demonstrate the full
+        capability of The Celestial Firmament. They handle local invoicing, taxes
+        and language support, and many also offer integration, training and
+        on-site commissioning services.
+      </p>
+      <div class="regions">
+        <div class="region">
+          <h4>Europe</h4>
+          <p>Sweden, Norway, Denmark, Germany, France, United Kingdom, Spain, Italy, Netherlands, Poland.</p>
+        </div>
+        <div class="region">
+          <h4>Americas</h4>
+          <p>United States, Canada, Mexico, Brazil, Argentina, Chile.</p>
+        </div>
+        <div class="region">
+          <h4>Asia &amp; Pacific</h4>
+          <p>Japan, South Korea, Singapore, Taiwan, Australia, New Zealand, India.</p>
+        </div>
+        <div class="region">
+          <h4>Middle East &amp; Africa</h4>
+          <p>United Arab Emirates, Saudi Arabia, South Africa, Egypt, Israel.</p>
+        </div>
+      </div>
+      <div class="button-row">
+        <a class="btn primary" href="mailto:partners@celestial-firmament.example">Find a partner</a>
+        <a class="btn" href="mailto:partners@celestial-firmament.example?subject=Become%20a%20partner">Become a partner</a>
+      </div>
+    </section>
+
+    <section class="faq">
+      <h2>Frequently asked</h2>
+      <details>
+        <summary>Can I try before I buy?</summary>
+        <p>Yes. The Observer edition is free for personal use and shares the same render engine as the commercial editions. For commercial trials, contact your partner for a 30-day evaluation key.</p>
+      </details>
+      <details>
+        <summary>Is the licence perpetual or subscription?</summary>
+        <p>Composer is sold as an annual subscription that includes all updates and email support. Firmament is offered as a perpetual site licence with an optional annual maintenance plan.</p>
+      </details>
+      <details>
+        <summary>Do you offer education or non-profit pricing?</summary>
+        <p>Accredited educational institutions, museums and registered non-profits qualify for a 40% discount on Composer and bespoke pricing on Firmament. Ask your partner or write to sales directly.</p>
+      </details>
+      <details>
+        <summary>What about offline activation?</summary>
+        <p>All editions can activate offline using a one-time challenge file. Firmament additionally supports an on-premise activation server for air-gapped deployments.</p>
+      </details>
+      <details>
+        <summary>Which platforms are supported?</summary>
+        <p>Windows 10/11, macOS 13 and later, and Ubuntu 22.04 LTS. WebGL 2.0 capable hardware is required; a discrete GPU is recommended for 4K and dome output.</p>
+      </details>
+    </section>
+
+    <section class="contact">
+      <h2>Talk to sales directly</h2>
+      <p class="lede">
+        No partner in your territory, or a project that needs special attention?
+        Our sales team is happy to help and will route you to the closest partner
+        or handle the order in-house.
+      </p>
+      <div class="button-row">
+        <a class="btn primary" href="mailto:sales@celestial-firmament.example">Email sales</a>
+        <a class="btn" href="index.html">Back to the firmament</a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div>&copy; The Celestial Firmament &middot; All rights reserved</div>
+    <div>
+      <a href="index.html">Explore</a> &nbsp;&middot;&nbsp;
+      <a href="how-to-buy.html">How to Buy</a> &nbsp;&middot;&nbsp;
+      <a href="mailto:sales@celestial-firmament.example">Contact</a>
+    </div>
+  </footer>
+</body>
+
+</html>

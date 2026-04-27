@@ -134,6 +134,23 @@
       line-height: 1.6;
     }
 
+    #buy-link {
+      position: fixed;
+      bottom: 24px;
+      left: 28px;
+      color: rgba(160, 185, 230, 0.55);
+      font-size: 11px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      text-decoration: none;
+      z-index: 10;
+      user-select: none;
+      transition: color 0.2s ease;
+    }
+    #buy-link:hover {
+      color: rgba(210, 230, 255, 0.95);
+    }
+
     #demo-badge {
       display: none;
       position: fixed;
@@ -580,6 +597,7 @@
     <div class="con-desc" id="con-desc"></div>
   </div>
   <div id="fps">-- FPS</div>
+  <a id="buy-link" href="how-to-buy.html" title="Licensing &amp; partners">How to Buy</a>
   <div id="demo-badge">Demo</div>
   <div id="demo-timing"></div>
   <div id="music-badge"></div>
